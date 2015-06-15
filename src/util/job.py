@@ -11,30 +11,36 @@ import Queue, threading
 
 class AbstractJob(threading.Thread):
     
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+    def __init__(self, updater=None,  group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
         threading.Thread.__init__(self, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
         self._exit_flag = False
         self._job_name = "[Job:" + self.name + "]"
-        
-        if self._datalogger is not None:
-            self._datalogger.data_queue[self.name] = Queue.Queue()
+
+        self._updater = updater
     
     def stop(self):
         self._exit_flag = True
-
     
     def _job(self):
         # check for needed objects
+        if self._updater is None:
+            return False;
+
         return True
 
-class JobImple(AbstractJob): #TODO better name
-    def __init__(self, group=None, name="CSVWriterJob", args=(), kwargs=None, verbose=None):
+
+
+class UpdateItemJob(AbstractJob):
+    def __init__(self, updater=None, group=None, name="UpdateItemJob", args=(), kwargs=None, verbose=None):
         target = self._job
-        AbstractJob.__init__(self, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
+
+        AbstractJob.__init__(self, updater=updater, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
         
     def _job(self):
         # check for needed objects
-        if AbstractJob._job(self):
+        if not AbstractJob._job(self):
+            EventLogger.critical(str(self.name) + " stopped!!")
             return
 
-        EventLogger.debug(str(self._job_name) + " NYI")
+        EventLogger.debug(str(self._job_name) + " updater="+str(self._updater))
+        EventLogger.debug(str(self._job_name) + " TODO: send REST to Items!")
