@@ -3,18 +3,17 @@
                                 Jobs
  ---------------------------------------------------------------------------*/
 """
+from src.profiling.updater import RESTUpdater
 from src.util.event_logger import EventLogger
 
 import Queue, threading
-
-
 
 class AbstractJob(threading.Thread):
     
     def __init__(self, updater=None,  group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
         threading.Thread.__init__(self, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
         self._exit_flag = False
-        self._job_name = "[Job:" + self.name + "]"
+        self._job_name = "[JOB:" + self.name + "]"
 
         self._updater = updater
     
@@ -28,8 +27,6 @@ class AbstractJob(threading.Thread):
 
         return True
 
-
-
 class UpdateItemJob(AbstractJob):
     def __init__(self, updater=None, group=None, name="UpdateItemJob", args=(), kwargs=None, verbose=None):
         target = self._job
@@ -39,8 +36,11 @@ class UpdateItemJob(AbstractJob):
     def _job(self):
         # check for needed objects
         if not AbstractJob._job(self):
-            EventLogger.critical(str(self.name) + " stopped!!")
+            EventLogger.critical(str(self._job_name) + " stopped!!")
             return
 
         EventLogger.debug(str(self._job_name) + " updater="+str(self._updater))
-        EventLogger.debug(str(self._job_name) + " TODO: send REST to Items!")
+        ret_value = self._updater.start()
+        EventLogger.info(str(self._job_name) + " " + str(ret_value))
+
+

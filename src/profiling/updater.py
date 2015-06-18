@@ -1,3 +1,4 @@
+import requests
 from src.util.event_logger import EventLogger
 
 
@@ -5,6 +6,9 @@ class AbstractUpdaterObject():
     def __init__(self, key, value):
         self._key = key
         self._value = value
+
+    def start(self):
+        pass
 
     def __str__(self):
         return "[Key:" + str(self._key) + ", Value:" + str(self._value) + "]"
@@ -15,29 +19,31 @@ class ItemUpdaterObject(AbstractUpdaterObject):
         AbstractUpdaterObject.__init__(self, key, value)
 
 
-""" old idea
-class AbstractUpdater():
+class RESTUpdater(AbstractUpdaterObject):
+    OPENHAB_IP = "192.168.0.32:8080"
+
     def __init__(self, key, value):
-        self._key = key
-        self._value = value
+        AbstractUpdaterObject.__init__(self, key, value)
+        self._name = "[RESTUpdater:" + self._key + "," + self._value + "]"
 
-    def startUpdating(self):
-        if self._key is None:
-            EventLogger.critical("Updater Key was None!")
-            return False
+    def start(self):
+        #EventLogger.debug(self._name + " started...")
+        try:
+            return self.__postCommand()
+        except Exception as ce:
+            EventLogger.error(self._name + " " + str(ce))
+            return self._name + " " + str(ce)
 
-        if self._value is None:
-            EventLogger.critical("Updater Value was None!")
-            return False
+    def __postCommand(self):
+        EventLogger.debug(self._name + " POST[key:" + self._key + "|value:" + self._value + "]")
+        header = {'Content-Type': 'text/plain'}
+        url = 'http://%s/rest/items/%s' % (RESTUpdater.OPENHAB_IP, self._key)
+        #print "URL  :" + str(url)
+        #print "DATA :" + str(self._value)
 
-        return True
+        req = requests.post(url, data=self._value, headers=header)
+        if req.status_code != requests.codes.ok:
+            req.raise_for_status()
 
+        return "Status: " + str(requests.codes.ok)
 
-class RESTUpdater(AbstractUpdater):
-    def __init__(self, key, value):
-        AbstractUpdater.__init__(self, key, value)
-
-    def startUpdating(self):
-        if not AbstractUpdater.startUpdating(self):
-            return
-"""
