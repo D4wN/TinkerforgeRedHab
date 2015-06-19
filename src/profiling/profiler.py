@@ -1,7 +1,7 @@
 import codecs
 import os
-from src.profiling.habUpdater import HabUpdater
-from src.util.event_logger import EventLogger
+from profiling.habUpdater import HabUpdater
+from util.event_logger import EventLogger
 
 
 class Profiler():

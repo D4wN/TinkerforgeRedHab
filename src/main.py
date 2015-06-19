@@ -1,5 +1,9 @@
-from src.profiling.profiler import Profiler
-from src.util.event_logger import EventLogger, FileLogger, ConsoleLogger
+import sys
+
+print sys.path
+
+from profiling.profiler import Profiler
+from util.event_logger import EventLogger, ConsoleLogger
 
 def __init_event_logging():
     EventLogger.add_logger(ConsoleLogger("ConsoleLogger", EventLogger.EVENT_LOG_LEVEL))

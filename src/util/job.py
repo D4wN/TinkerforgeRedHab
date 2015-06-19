@@ -3,8 +3,8 @@
                                 Jobs
  ---------------------------------------------------------------------------*/
 """
-from src.profiling.updater import RESTUpdater
-from src.util.event_logger import EventLogger
+from profiling.updater import RESTUpdater
+from util.event_logger import EventLogger
 
 import Queue, threading
 

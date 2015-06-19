@@ -1,7 +1,7 @@
 import os
 import requests
-import src.profiling.habUpdater
-from src.util.event_logger import EventLogger
+import profiling.habUpdater
+from util.event_logger import EventLogger
 
 
 class AbstractUpdaterObject():
@@ -88,10 +88,11 @@ class RuleUpdater(AbstractUpdaterObject):
 
         cleaned_content = self.__cleanString(content)  # for simple contains search functionality
 
-        for rule in self._rules[src.profiling.habUpdater.HabUpdater.PROFILE_KEY_RULES]:
+        for rule in self._rules[profiling.habUpdater.HabUpdater.PROFILE_KEY_RULES]:
             content = self._insertRule(content, cleaned_content, rule)
 
         #write content back
+        # FIXME: Permission Problems? How can we open the file as Admin?!
         with open(self._rules[RuleUpdater.PATH_RULES_KEY], "w") as f:
             f.write(content);
 
