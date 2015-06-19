@@ -44,3 +44,20 @@ class UpdateItemJob(AbstractJob):
         EventLogger.info(str(self._job_name) + " " + str(ret_value))
 
 
+class UpdateRuleJob(AbstractJob):
+    def __init__(self, updater=None, group=None, name="UpdateRuleJob", args=(), kwargs=None, verbose=None):
+        target = self._job
+
+        AbstractJob.__init__(self, updater=updater, group=group, target=target, name=name, args=args, kwargs=kwargs,
+                             verbose=verbose)
+
+    def _job(self):
+        # check for needed objects
+        if not AbstractJob._job(self):
+            EventLogger.critical(str(self._job_name) + " stopped!!")
+            return
+
+        EventLogger.debug(str(self._job_name) + " updater=" + str(self._updater))
+        ret_value = self._updater.start()
+
+        EventLogger.info(str(self._job_name) + " " + str(ret_value))

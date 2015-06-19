@@ -32,7 +32,7 @@ class Profiler():
 
 
                 with codecs.open(path_to_file, 'r', 'UTF-8') as content_file:
-                    HabUpdater("[Profiler:"+str(recognized_name)+"]", content_file)
+                    HabUpdater(recognized_name, content_file)
                 break;
 
         if not found:
