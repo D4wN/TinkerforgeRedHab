@@ -22,6 +22,9 @@ class ItemUpdaterObject(AbstractUpdaterObject):
         self._name = "[ItemUpdaterObject:" + self._key + "," + self._value + "]"
 
 
+"""
+Comments TODOdasdada
+"""
 class RESTUpdater(AbstractUpdaterObject):
     OPENHAB_IP = "192.168.0.32:8080"
     # TODO find better solution for inverting values, or resetting them
