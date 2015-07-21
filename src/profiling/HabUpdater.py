@@ -5,7 +5,7 @@ from util.job import UpdateItemJob, UpdateRuleJob
 
 
 """
-Comments TODOdasdasdd
+Comments TODO
 asd
 asdadasdad
 """
