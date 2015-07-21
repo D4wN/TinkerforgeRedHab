@@ -10,7 +10,7 @@ class Profiler():
     def __init__(self, name):
         self._name = name
 
-    def startProfileRoutine(self, recognized_name):
+    def startProfileRoutine(self, recognized_name, remove_mode=False):
         EventLogger.debug(str(self._name) + " Profile Name: " + str(recognized_name))
         # 1. look for profile
         files = self.__getProfileList()
@@ -32,7 +32,7 @@ class Profiler():
 
 
                 with codecs.open(path_to_file, 'r', 'UTF-8') as content_file:
-                    HabUpdater(recognized_name, content_file)
+                    HabUpdater(recognized_name, content_file, remove_mode)
                 break;
 
         if not found:
