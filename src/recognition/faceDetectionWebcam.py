@@ -11,6 +11,11 @@ def face_detection_webcam(callback):
     :return:    frame, cleanImages
     '''
 
+    camisOpen = True
+    if not video_capture.isOpened():
+        print "ERROR: Can't connect to Webcam"
+        sys.exit()
+
     while True:
         cleanImages = []
         frame = None
