@@ -3,9 +3,9 @@ from random import randint
 import sys
 
 # own imports
-from FaceDetectionWebcam import *
-import GenerateFaceDatabase as gfd
-import Utilities as util
+from faceDetectionWebcam import *
+import generateFaceDatabase as gfd
+import utilities as util
 
 
 progess = False

@@ -1,7 +1,8 @@
 import cv2
-import Utilities as util
-import FaceDetectionWebcam as fdw
 import os
+
+import utilities as util
+import faceDetectionWebcam as fdw
 
 faceCascade = cv2.CascadeClassifier('./res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
