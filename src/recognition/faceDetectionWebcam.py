@@ -7,6 +7,9 @@ faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_a
 video_capture = cv2.VideoCapture(0)
 video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
 
+video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+
 def face_detection_webcam(callback):
     '''
     Reads the frames from the std. video camera until it detects a face.
@@ -22,26 +25,31 @@ def face_detection_webcam(callback):
         frame = None
         faces = None
 
-        _, frame = video_capture.read()
-        # numpy.ndarray is the type of the output
-        # FIXME: should be checked (maxSize  and minSize)
-        faces = faceCascade.detectMultiScale(
-            cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
-            scaleFactor=1.1,
-            minNeighbors=10,
-            minSize=(30, 30),
-            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-        )
-        EventLogger.info("Found " + str(len(faces)) + " face/faces")
+        if not video_capture.grab():
+            continue
 
-        # convert colored frame into gray frame
-        gryFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # get only faces out of the frame
-        for (x, y, w, h) in faces:
-            cleanImages.append(cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h)))
+        _, frame = video_capture.retrieve()
+        # _, frame = video_capture.read()
+        if frame is not None:
+            # numpy.ndarray is the type of the output
+            # FIXME: should be checked (maxSize  and minSize)
+            faces = faceCascade.detectMultiScale(
+                cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
+                scaleFactor=1.1,
+                minNeighbors=10,
+                minSize=(30, 30),
+                flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+            )
+            EventLogger.info("Found " + str(len(faces)) + " face/faces")
 
-        if len(cleanImages) != 0:
-            break
+            # convert colored frame into gray frame
+            gryFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # get only faces out of the frame
+            for (x, y, w, h) in faces:
+                cleanImages.append(cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h)))
+
+            if len(cleanImages) != 0:
+                break
 
     # callback on detected face
     callback(frame, cleanImages)
