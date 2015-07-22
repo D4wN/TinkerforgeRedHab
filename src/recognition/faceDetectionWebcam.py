@@ -5,6 +5,7 @@ from util.event_logger import EventLogger
 
 faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
+video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
 
 def face_detection_webcam(callback):
     '''

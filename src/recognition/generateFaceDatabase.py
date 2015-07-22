@@ -27,6 +27,7 @@ class GenerateFaceDatabase:
         try:
             for i in range(0, MAX_IMAGES):
                 fdw.face_detection_webcam(self._found_face)
+
         except Exception as e:
             EventLogger.error(e)
         finally:

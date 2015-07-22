@@ -40,6 +40,9 @@ def found_face(frame, faces):
 if __name__ == '__main__':
     EventLogger.add_logger(ConsoleLogger("ConsoleLogger", EventLogger.EVENT_LOG_LEVEL))
 
+    if len(sys.argv) != 2:
+        EventLogger.error("Please start this Program with the parameter 1 or 0")
+
     if sys.argv[1] == "1":#------------------------------------------------| Create_Database_Mode
         EventLogger.info("Start Mode 1: Create Face Database")
         fdb = gfd.GenerateFaceDatabase("Roland")
