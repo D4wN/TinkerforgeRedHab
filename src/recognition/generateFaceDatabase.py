@@ -5,8 +5,6 @@ import utilities as util
 import faceDetectionWebcam as fdw
 from util.event_logger import EventLogger
 
-faceCascade = cv2.CascadeClassifier('../recognition/res/haarcascade_frontalface_alt.xml')
-video_capture = cv2.VideoCapture(0)
 MAX_IMAGES = 10
 
 class GenerateFaceDatabase:
@@ -31,4 +29,4 @@ class GenerateFaceDatabase:
         except Exception as e:
             EventLogger.error(e)
         finally:
-            video_capture.release()
+            fdw.end_webcam()
