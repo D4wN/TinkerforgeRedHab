@@ -5,7 +5,7 @@ import utilities as util
 import faceDetectionWebcam as fdw
 from util.event_logger import EventLogger
 
-faceCascade = cv2.CascadeClassifier('./res/haarcascade_frontalface_alt.xml')
+faceCascade = cv2.CascadeClassifier('../recognition/res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
 MAX_IMAGES = 10
 

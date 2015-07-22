@@ -3,7 +3,7 @@ import sys
 import numpy as np
 from util.event_logger import EventLogger
 
-faceCascade = cv2.CascadeClassifier('./res/haarcascade_frontalface_alt.xml')
+faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
 
 def face_detection_webcam(callback):
@@ -22,7 +22,6 @@ def face_detection_webcam(callback):
         faces = None
 
         _, frame = video_capture.read()
-
         # numpy.ndarray is the type of the output
         # FIXME: should be checked (maxSize  and minSize)
         faces = faceCascade.detectMultiScale(
