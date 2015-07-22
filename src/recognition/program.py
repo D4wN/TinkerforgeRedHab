@@ -6,7 +6,7 @@ import sys
 from faceDetectionWebcam import *
 import generateFaceDatabase as gfd
 import utilities as util
-
+from util.event_logger import EventLogger, ConsoleLogger
 
 progess = False
 lock = allocate_lock()
@@ -38,11 +38,15 @@ def found_face(frame, faces):
 
 
 if __name__ == '__main__':
+    EventLogger.add_logger(ConsoleLogger("ConsoleLogger", EventLogger.EVENT_LOG_LEVEL))
+
     if sys.argv[1] == "1":#------------------------------------------------| Create_Database_Mode
+        EventLogger.info("Start Mode 1: Create Face Database")
         fdb = gfd.GenerateFaceDatabase("Roland")
         fdb.generate_face_database()
 
     else:#-----------------------------------------------------------------| Face_Detection_Mode
+        EventLogger.info("Start Mode 0: Detecting Faces")
         try:
             progess = False
             while True:
@@ -54,6 +58,6 @@ if __name__ == '__main__':
                     progess = start_new_thread(face_detection_webcam, (found_face,))
 
         except KeyboardInterrupt:
-            print "Will now end this program"
-
-    end_webcam()
+            EventLogger.info("Will now end this program")
+        finally:
+            end_webcam()

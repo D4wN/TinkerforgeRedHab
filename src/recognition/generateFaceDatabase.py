@@ -3,6 +3,7 @@ import os
 
 import utilities as util
 import faceDetectionWebcam as fdw
+from util.event_logger import EventLogger
 
 faceCascade = cv2.CascadeClassifier('./res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
@@ -15,13 +16,18 @@ class GenerateFaceDatabase:
 
     def _found_face(self, frame, faces):
          for img in faces:
-            util.save_image(self.userPath + "/" + str(self.index) + ".pgm", img)
+            imgPath = self.userPath + "/" + str(self.index) + ".pgm"
+            EventLogger.info("Save Image: " + imgPath)
+            util.save_image(imgPath, img)
             self.index += 1
 
     def generate_face_database(self):
         # start capturing
         # TODO: check on first image if there is already an entry for this user ?
-        for i in range(0, MAX_IMAGES):
-            fdw.face_detection_webcam(self._found_face)
-
-        video_capture.release()
+        try:
+            for i in range(0, MAX_IMAGES):
+                fdw.face_detection_webcam(self._found_face)
+        except Exception as e:
+            EventLogger.error(e)
+        finally:
+            video_capture.release()
