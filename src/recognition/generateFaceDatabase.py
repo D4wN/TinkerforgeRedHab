@@ -10,7 +10,7 @@ MAX_IMAGES = 10
 class GenerateFaceDatabase:
     def __init__(self, name):
         self.userPath = util.create_dir(name)
-        self.index = 0
+        self.index = 1
 
     def _found_face(self, frame, faces):
          for img in faces:
@@ -25,6 +25,10 @@ class GenerateFaceDatabase:
         try:
             for i in range(0, MAX_IMAGES):
                 fdw.face_detection_webcam(self._found_face)
+
+            # create csv
+            csvPath = "./recognition/faceDatabase"
+            util.create_csv(csvPath)
 
         except Exception as e:
             EventLogger.error(e)
