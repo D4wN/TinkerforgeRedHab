@@ -3,13 +3,32 @@ import os
 from profiling.habUpdater import HabUpdater
 from util.event_logger import EventLogger
 
-
+"""
+/*---------------------------------------------------------------------------
+                                Profiler
+ ---------------------------------------------------------------------------*/
+"""
 class Profiler():
     PROFILE_LOCATION_PATH = "./openHabProfiles"
 
+    """
+    Init of the class.
+    Params:
+    name        =>  Name of the Profiler, usually used for Debug purpose.
+    """
     def __init__(self, name):
         self._name = name
 
+    """
+    Main function of this class. First checks for profile files, then if the given recognized_name exists
+    and if it exists, it's contents will be read and given to the HubUpdater class.
+    Params:
+    recognized_name     =>  The name of the recognized person. Equals the profile file name.
+    remove_mode         =>  Default: False. If set to True, the Rules of the profile will be removed from them openHab
+                            rules file and the Items will be inverted, if possible(ON->OFF).
+    Return:
+    None
+    """
     def startProfileRoutine(self, recognized_name, remove_mode=False):
         EventLogger.debug(str(self._name) + " Profile Name: " + str(recognized_name))
         # 1. look for profile
@@ -38,6 +57,13 @@ class Profiler():
         if not found:
             EventLogger.warning(str(self._name) + " Profile(" + str(recognized_name) + ") not found!")
 
+    """
+    This function will return a list of profile names in a specific folder(currently ../../openHabProfiles)
+    Params:
+    None
+    Return:
+    profile_list     =>  A list of profile names in a given folder.
+    """
     def __getProfileList(self):
         try:
             profile_dir = os.path.join(os.path.dirname(__file__), "..", "..",
@@ -49,6 +75,14 @@ class Profiler():
 
         return files
 
+    """
+    Simple Debug function to print the profile list.
+    Params:
+    None
+    Return:
+    On Success      =>  Nothing
+    On Error        =>  A Error Message
+    """
     def _debugShowProfileList(self):
         files = self.__getProfileList()
 

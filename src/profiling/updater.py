@@ -2,7 +2,11 @@ import os
 import requests
 from util.event_logger import EventLogger
 
-
+"""
+/*---------------------------------------------------------------------------
+                                AbstractUpdaterObject
+ ---------------------------------------------------------------------------*/
+"""
 class AbstractUpdaterObject():
     def __init__(self, key, value):
         self._key = key
@@ -16,23 +20,42 @@ class AbstractUpdaterObject():
         return str(self._name)
 
 
+"""
+/*---------------------------------------------------------------------------
+                                ItemUpdaterObject
+ ---------------------------------------------------------------------------*/
+"""
 class ItemUpdaterObject(AbstractUpdaterObject):
+    """
+    NYI
+    """
     def __init__(self, key, value):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[ItemUpdaterObject:" + self._key + "," + self._value + "]"
 
-
 """
-Comments TODOdasdada
+/*---------------------------------------------------------------------------
+                                RESTUpdater
+ ---------------------------------------------------------------------------*/
 """
 class RESTUpdater(AbstractUpdaterObject):
-    OPENHAB_IP = "192.168.0.32:8080"
+    OPENHAB_IP = "192.168.0.32:8080"  # FIXME should be in the profile file?
     # TODO find better solution for inverting values, or resetting them
     KNOWN_VALUE_NEGATIVES = {
         'ON': 'OFF',
-        'OFF': 'ON'
+        'OFF': 'ON',
+        'TFNUM<00>Hallo: Marvin': 'TFNUM<00>Wiedersehen! '  #TODO Temp only to delte the message
     }
 
+    """
+    This class updates Items values over the REST Api.
+    Params:
+    key             =>  Item name/description.
+    value           =>  The new value of the item.
+    reset_item      =>  Default: False; If True, the item value will be inverted, if possible!
+    Return:
+    None
+    """
     def __init__(self, key, value, reset_item=False):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[RESTUpdater:" + self._key + "," + self._value + "]"
@@ -70,17 +93,40 @@ class RESTUpdater(AbstractUpdaterObject):
         return "Status: " + str(requests.codes.ok)
 
 
+"""
+/*---------------------------------------------------------------------------
+                                RESTUpdater
+ ---------------------------------------------------------------------------*/
+"""
 class RuleUpdater(AbstractUpdaterObject):
     PATH_RULES_KEY = "PATH_TO_RULES_FILE"
     RULE_START_FORMATTER = "#start#%s#%s#"  # % (key, value)
     RULE_END_FORMATTER = "#end#%s#%s#"
 
+    """
+    This class updates the rules file of openHab. ONLY working on localhost right now!
+    Params:
+    rules           =>  The rules as list.
+    key             =>  ID of the profile.
+    value           =>  Name of the profile.
+    remove_rules    =>  Default: False; If True, rules will be removed from the rules file, if possible!
+    Return:
+    None
+    """
     def __init__(self, rules, key=None, value=None, remove_rules=False):
         AbstractUpdaterObject.__init__(self, key, value)
         self._rules = rules
         self._name = "[RuleUpdater:" + str(self._key) + "," + str(self._value) + "]"
         self._remove_rules = remove_rules;
 
+    """
+    This function starts the rule update process.
+    Params:
+    None
+    Return:
+    On Success      =>  Message(Rules injected!)
+    On Error        =>  Error message.
+    """
     def start(self):
         from profiling.habUpdater import HabUpdater
         EventLogger.debug(self._name + " started...")
@@ -119,6 +165,14 @@ class RuleUpdater(AbstractUpdaterObject):
 
         return self._name + " Rules injected!"
 
+    """
+    This function injects a rule into the rules file.
+    Params:
+    content         =>  The current rules file content as string.
+    rule            =>  The rule as string.
+    Return:
+    content         =>  The new content as string.
+    """
     def _insertRule(self, content, rule):
         ##add identifier to the rule TODO: temp solution, need format?
         rule = (
@@ -135,6 +189,14 @@ class RuleUpdater(AbstractUpdaterObject):
 
         return content
 
+    """
+    This function removes a rule from the rules file.
+    Params:
+    content         =>  The current rules file content as string.
+    rule            =>  The rule as string.
+    Return:
+    content         =>  The new content as string.
+    """
     def _removeRule(self, content, rule):
         rule = (
             ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
@@ -150,9 +212,23 @@ class RuleUpdater(AbstractUpdaterObject):
 
         return content
 
+    """
+    This function injects a rule into the rules file.
+    Params:
+    s           =>  A String which will be cleaned.
+    Return:
+    s           =>  The cleaned String.
+    """
     def __cleanString(self, s):
         return s.replace('\n', '').replace('\r', '').replace('\t', '').replace(' ', '')
 
+    """
+    A Function to log and return an Error.
+    Params:
+    msg         =>  The Error message.
+    Return:
+    msg         =>  The Error message.
+    """
     def __errorReturn(self, msg):
         EventLogger.error(msg)
         return msg

@@ -12,9 +12,10 @@ def __init_event_logging():
 if __name__ == '__main__':
     __init_event_logging()
 
-    p = Profiler("[Profiler:Main]");
+    p = Profiler("[Profiler:Main]")
     #p._debugShowProfileList()
-    p.startProfileRoutine("test", True);
+    # p.startProfileRoutine("test", True)
+    p.startProfileRoutine("test", False)
 
     #1. Start Recognition(THREAD)
     #2. Wait for Answers -> (Recognized Person)
