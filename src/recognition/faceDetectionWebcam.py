@@ -55,7 +55,7 @@ def face_detection_webcam(callback):
                 original_face = cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h))
 
                 sized_face = cv2.cv.CreateImage((WIDTH,HEIGHT), 8, 1)
-                cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_LINEAR)
+                cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_AREA)
 
                 cleanImages.append(sized_face)
 
