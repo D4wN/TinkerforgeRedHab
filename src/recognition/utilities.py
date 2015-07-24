@@ -9,13 +9,13 @@ def save_image(path, image):
 def show_image(name, image):
     cv.NamedWindow(name, 1)
     cv.ShowImage(name, image)
-    waitKey(0) & 0xFF
+    waitKey(0)
 
 # TODO: convertTo pgm tool
 
 # OS utilities
 def create_dir(name):
-    path = "./faceDatabase/" + name
+    path = "./recognition/faceDatabase/" + name
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -23,7 +23,10 @@ def create_dir(name):
     return path
 
 def create_csv(basePath):
+    EventLogger.info("create_csv: Starting")
     SEPARATOR=";"
+
+    f = open(basePath + "/faces.csv", 'w')
 
     label = 0
     for dirname, dirnames, filenames in os.walk(basePath):
@@ -31,8 +34,7 @@ def create_csv(basePath):
             subject_path = os.path.join(dirname, subdirname)
             for filename in os.listdir(subject_path):
                 abs_path = "%s/%s" % (subject_path, filename)
-                EventLogger.info(abs_path, SEPARATOR, label)
-
+                f.write(str(abs_path) + " " +  str(SEPARATOR) + " " + str(label) + "\n")
             label += 1
 
-    #TODO: write the csv to file
+    f.close()

@@ -2,13 +2,18 @@ import cv2
 import sys
 import numpy as np
 from util.event_logger import EventLogger
+import utilities as util
 
 faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
 video_capture = cv2.VideoCapture(0)
-video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
 
+# webcam setup
+video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
 video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
 video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+
+WIDTH = 92
+HEIGHT = 112
 
 def face_detection_webcam(callback):
     '''
@@ -22,6 +27,7 @@ def face_detection_webcam(callback):
 
     while True:
         cleanImages = []
+        cleanSizedImages = []
         frame = None
         faces = None
 
@@ -46,7 +52,12 @@ def face_detection_webcam(callback):
             gryFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             # get only faces out of the frame
             for (x, y, w, h) in faces:
-                cleanImages.append(cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h)))
+                original_face = cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h))
+
+                sized_face = cv2.cv.CreateImage((WIDTH,HEIGHT), 8, 1)
+                cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_LINEAR)
+
+                cleanImages.append(sized_face)
 
             if len(cleanImages) != 0:
                 break
