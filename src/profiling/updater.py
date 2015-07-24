@@ -74,12 +74,12 @@ class RESTUpdater(AbstractUpdaterObject):
 
         # EventLogger.debug(self._name + " started...")
         try:
-            return self.__postCommand()
+            return self.__post_command()
         except Exception as ce:
             EventLogger.error(self._name + " " + str(ce))
             return self._name + " " + str(ce)
 
-    def __postCommand(self):
+    def __post_command(self):
         EventLogger.debug(self._name + " POST[key:" + self._key + "|value:" + self._value + "]")
         header = {'Content-Type': 'text/plain'}
         url = 'http://%s/rest/items/%s' % (RESTUpdater.OPENHAB_IP, self._key)
@@ -133,15 +133,15 @@ class RuleUpdater(AbstractUpdaterObject):
 
         # check dir for ID entry
         if self._key is None:
-            return self.__errorReturn(self._name + " No ID was specified in the Profile!")
+            return self.__error_return(self._name + " No ID was specified in the Profile!")
 
         if not self._rules.has_key(RuleUpdater.PATH_RULES_KEY):
-            return self.__errorReturn(self._name + " Rules have no entries \"" + RuleUpdater.PATH_RULES_KEY + "\"")
+            return self.__error_return(self._name + " Rules have no entries \"" + RuleUpdater.PATH_RULES_KEY + "\"")
 
         # check if rules file exists
 
         if not os.path.isfile(self._rules[RuleUpdater.PATH_RULES_KEY]):
-            return self.__errorReturn(
+            return self.__error_return(
                 self._name + " No rules file found under \"" + self._rules[RuleUpdater.PATH_RULES_KEY] + "\"")
 
         # open rules to read all of them
@@ -150,13 +150,13 @@ class RuleUpdater(AbstractUpdaterObject):
             content = f.read()
 
         if content is None:
-            return self.__errorReturn(self._name + " Content of the rules could not be read!")
+            return self.__error_return(self._name + " Content of the rules could not be read!")
         for rule in self._rules[HabUpdater.PROFILE_KEY_RULES]:
 
             if self._remove_rules:
-                content = self._removeRule(content, rule)
+                content = self._remove_rule(content, rule)
             else:
-                content = self._insertRule(content, rule)
+                content = self._insert_rule(content, rule)
 
         # write content back
         # FIXME: Permission Problems? How can we open the file as Admin?!
@@ -173,13 +173,14 @@ class RuleUpdater(AbstractUpdaterObject):
     Return:
     content         =>  The new content as string.
     """
-    def _insertRule(self, content, rule):
+
+    def _insert_rule(self, content, rule):
         ##add identifier to the rule TODO: temp solution, need format?
         rule = (
             ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
                 "\n//#end#%s#%s#\n" % (self._key, self._value)))
-        cleaned_rule = self.__cleanString(rule)
-        cleaned_content = self.__cleanString(content)  # for simple contains search functionality
+        cleaned_rule = self.__clean_string(rule)
+        cleaned_content = self.__clean_string(content)  # for simple contains search functionality
 
         if cleaned_rule not in cleaned_content:
             EventLogger.info(self._name + " Inserted Rule: " + cleaned_rule)
@@ -197,12 +198,13 @@ class RuleUpdater(AbstractUpdaterObject):
     Return:
     content         =>  The new content as string.
     """
-    def _removeRule(self, content, rule):
+
+    def _remove_rule(self, content, rule):
         rule = (
             ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
                 "\n//#end#%s#%s#\n" % (self._key, self._value)))
-        cleaned_rule = self.__cleanString(rule)
-        cleaned_content = self.__cleanString(content)  # for simple contains search functionality
+        cleaned_rule = self.__clean_string(rule)
+        cleaned_content = self.__clean_string(content)  # for simple contains search functionality
 
         if cleaned_rule in cleaned_content:
             EventLogger.info(self._name + " Removed Rule: " + cleaned_rule)
@@ -219,7 +221,8 @@ class RuleUpdater(AbstractUpdaterObject):
     Return:
     s           =>  The cleaned String.
     """
-    def __cleanString(self, s):
+
+    def __clean_string(self, s):
         return s.replace('\n', '').replace('\r', '').replace('\t', '').replace(' ', '')
 
     """
@@ -229,6 +232,7 @@ class RuleUpdater(AbstractUpdaterObject):
     Return:
     msg         =>  The Error message.
     """
-    def __errorReturn(self, msg):
+
+    def __error_return(self, msg):
         EventLogger.error(msg)
         return msg

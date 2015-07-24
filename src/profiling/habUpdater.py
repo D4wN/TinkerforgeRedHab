@@ -32,10 +32,10 @@ class HabUpdater():
         self._jobs = []
         self._remove_mode = remove_mode;
 
-        if not self.__readProfile():
+        if not self.__read_profile():
             EventLogger.critical(self._name + " Update Process stopped!")
             return
-        self.__startJobs()
+        self.__start_jobs()
 
     """
     Function to read the content of the profile. Converts the content into a dict and return True on success.
@@ -46,7 +46,8 @@ class HabUpdater():
     True        =>  Contents could be read, dict was created.
     False       =>  Contents could not be read(no JSON format).
     """
-    def __readProfile(self):
+
+    def __read_profile(self):
 
         try:
             self._profile_content = json.load(self._profile_file)
@@ -65,7 +66,8 @@ class HabUpdater():
     Return:
     None
     """
-    def __startJobs(self):
+
+    def __start_jobs(self):
         # ITEMS
         EventLogger.debug(self._name + " Items:")
         for key in self._profile_content[HabUpdater.PROFILE_KEY_ITEMS].keys():

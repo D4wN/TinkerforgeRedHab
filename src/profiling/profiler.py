@@ -29,10 +29,11 @@ class Profiler():
     Return:
     None
     """
-    def startProfileRoutine(self, recognized_name, remove_mode=False):
+
+    def start_profile_routine(self, recognized_name, remove_mode=False):
         EventLogger.debug(str(self._name) + " Profile Name: " + str(recognized_name))
         # 1. look for profile
-        files = self.__getProfileList()
+        files = self.__get_profile_list()
         if files is None:
             # 1.1 no profile found -> message to main
             EventLogger.info(str(self._name) + " No Profiles found in " + str(Profiler.PROFILE_LOCATION_PATH))
@@ -64,7 +65,8 @@ class Profiler():
     Return:
     profile_list     =>  A list of profile names in a given folder.
     """
-    def __getProfileList(self):
+
+    def __get_profile_list(self):
         try:
             profile_dir = os.path.join(os.path.dirname(__file__), "..", "..",
                                        Profiler.PROFILE_LOCATION_PATH)  # FIXME relative path?
@@ -83,8 +85,9 @@ class Profiler():
     On Success      =>  Nothing
     On Error        =>  A Error Message
     """
-    def _debugShowProfileList(self):
-        files = self.__getProfileList()
+
+    def _debug_show_profile_list(self):
+        files = self.__get_profile_list()
 
         if files is None:
             EventLogger.debug(str(self._name) + " No Files Found!")
