@@ -1,8 +1,9 @@
 Important Task to be done before running:
 
-1. RedBrick install requests (python pip install requests) <-- test it!
+1. RedBrick install requests (python pip install requests)
 2. change permission of the rules file u want to edit:
     a) Dir: /etc/openhab/configurations/rules
     b) sudo chmod o+w <filename>
 
-    //"PATH_TO_RULES_FILE": "/etc/openhab/configurations/rules/demo.rules",
+
+    "PATH_TO_RULES_FILE": "C:/Programmierung/Workspaces/Python/TinkerforgeRedHab/openHabProfiles/test.rules",
