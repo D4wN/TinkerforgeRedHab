@@ -5,6 +5,7 @@ import sys
 # own imports
 from recognition.faceDetectionWebcam import *
 import recognition.generateFaceDatabase as gfd
+import recognition.faceRecognitionEigenfaces as fre
 import recognition.utilities as util
 from util.event_logger import EventLogger, ConsoleLogger
 
@@ -48,8 +49,13 @@ if __name__ == '__main__':
         fdb = gfd.GenerateFaceDatabase("Roland")
         fdb.generate_face_database()
 
+    elif sys.argv[1] == "2":#------------------------------------------------| Face_Recognition_Mode
+        EventLogger.info("Start Mode 2: Face Recognition")
+        fr_instance = fre.faceRecognitionEigenfaces()
+        fr_instance.start_process()
+
     else:#-----------------------------------------------------------------| Face_Detection_Mode
-        EventLogger.info("Start Mode 0: Detecting Faces")
+        EventLogger.info("Start Mode default: Detecting Faces")
         try:
             progess = False
             while True:
