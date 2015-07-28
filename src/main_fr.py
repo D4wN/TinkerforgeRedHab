@@ -9,7 +9,7 @@ import recognition.faceRecognitionEigenfaces as fre
 import recognition.utilities as util
 from util.event_logger import EventLogger, ConsoleLogger
 
-progess = False
+process = False
 lock = allocate_lock()
 
 def look_for_face():
@@ -34,8 +34,8 @@ def found_face(frame, faces):
     # FIXME: same face as last frame
     # Eigenfaces/Fishfaces
 
-    global progess
-    progess = False
+    global process
+    process = False
 
 
 if __name__ == '__main__':
@@ -57,14 +57,14 @@ if __name__ == '__main__':
     else:#-----------------------------------------------------------------| Face_Detection_Mode
         EventLogger.info("Start Mode default: Detecting Faces")
         try:
-            progess = False
+            process = False
             while True:
-                if not progess:
+                if not process:
                     lock.acquire()
-                    progess = True
+                    process = True
                     lock.release()
 
-                    progess = start_new_thread(face_detection_webcam, (found_face,))
+                    process = start_new_thread(face_detection_webcam, (found_face,))
 
         except KeyboardInterrupt:
             EventLogger.info("Will now end this program")
