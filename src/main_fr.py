@@ -131,8 +131,6 @@ if __name__ == '__main__':
 
         except KeyboardInterrupt:
             EventLogger.info("Will now end this program")
-        finally:
-            end_webcam()
 
     db.set_selected_led_state(DualButton.LED_LEFT, DualButton.LED_STATE_OFF)
     db.set_selected_led_state(DualButton.LED_RIGHT, DualButton.LED_STATE_OFF)
