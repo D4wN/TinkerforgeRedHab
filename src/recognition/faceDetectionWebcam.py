@@ -73,5 +73,6 @@ def face_detection_webcam(callback):
     video_capture.release()
     EventLogger.info("Closed connection to the webcam")
 
+    TIMER_EXIT = False
     # callback on detected face
     callback(frame, cleanImages)
