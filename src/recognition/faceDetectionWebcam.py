@@ -3,17 +3,26 @@ import sys
 import numpy as np
 from util.event_logger import EventLogger
 import utilities as util
+import threading
 
 faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
 
 WIDTH_DB_FACES = 92
 HEIGHT_DB_FACES = 112
 
+TIMER_EXIT = False
+
+def _stop_webcam():
+    global TIMER_EXIT
+    TIMER_EXIT = True
+
 def face_detection_webcam(callback):
     '''
     Reads the frames from the std. video camera until it detects a face.
     :return:    frame, cleanImages
     '''
+    global TIMER_EXIT
+    threading.Timer(10, _stop_webcam).start()
 
     video_capture = cv2.VideoCapture(0)
 
@@ -26,7 +35,7 @@ def face_detection_webcam(callback):
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
 
-    while True: #FIXME: Set timeout for detection
+    while not TIMER_EXIT: #FIXME: Set timeout for detection
         cleanImages = []
         cleanSizedImages = []
         frame = None
@@ -64,5 +73,8 @@ def face_detection_webcam(callback):
                 break
 
     video_capture.release()
-    # callback on detected face
-    callback(frame, cleanImages)
+    EventLogger.info("Closed connection to the webcam")
+
+    if len(cleanImages) != 0:
+        # callback on detected face
+        callback(frame, cleanImages)
