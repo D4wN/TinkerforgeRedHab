@@ -51,6 +51,10 @@ class faceRecognitionEigenfaces:
     def _found_face(self,frame, faces):
         training_data = self.read_csv(("./recognition/faceDatabase/faces.csv")).readlines()
         data_dict = self.create_label_matrix_dict(training_data)
+        if len(data_dict) == 0:
+            EventLogger.error("There is no face database available")
+            return
+
         model = self.create_and_train_model_from_dict(data_dict)
 
         for img in faces:
@@ -61,7 +65,7 @@ class faceRecognitionEigenfaces:
             predicted_label = model.predict(self.read_matrix_from_file(path_file))
             for i in predicted_label:
                 #TODO: return index to Marvs module
-                print 'Predicted: %(predicted)s ' % {"predicted": i}
+                EventLogger.info('Predicted: %(predicted)s ' % {"predicted": i})
             try:
                 os.remove(path_file)
             except Exception as e:
