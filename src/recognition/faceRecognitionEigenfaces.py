@@ -48,7 +48,7 @@ class faceRecognitionEigenfaces:
         """ read in grayscale version of image from file """
         return cv2.imread(filename, cv2.CV_LOAD_IMAGE_GRAYSCALE)
 
-    def _found_face(self,frame, faces):
+    def _recognice_face(self,frame, faces):
         training_data = self.read_csv(("./recognition/faceDatabase/faces.csv")).readlines()
         data_dict = self.create_label_matrix_dict(training_data)
         if len(data_dict) == 0:
@@ -74,4 +74,4 @@ class faceRecognitionEigenfaces:
     def start_process(self):
         csvPath = "./recognition/faceDatabase"
         util.create_csv(csvPath)
-        fdw.face_detection_webcam(self._found_face)
+        fdw.face_detection_webcam(self._recognice_face)

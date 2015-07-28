@@ -35,12 +35,11 @@ def face_detection_webcam(callback):
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
 
-    while not TIMER_EXIT: #FIXME: Set timeout for detection
-        cleanImages = []
-        cleanSizedImages = []
-        frame = None
-        faces = None
+    cleanImages = []
+    frame = None
+    faces = None
 
+    while not TIMER_EXIT:
         if not video_capture.grab():
             continue
 
@@ -56,7 +55,6 @@ def face_detection_webcam(callback):
                 minSize=(30, 30),
                 flags=cv2.cv.CV_HAAR_SCALE_IMAGE
             )
-            EventLogger.info("Found " + str(len(faces)) + " face/faces")
 
             # convert colored frame into gray frame
             gryFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -75,6 +73,5 @@ def face_detection_webcam(callback):
     video_capture.release()
     EventLogger.info("Closed connection to the webcam")
 
-    if len(cleanImages) != 0:
-        # callback on detected face
-        callback(frame, cleanImages)
+    # callback on detected face
+    callback(frame, cleanImages)
