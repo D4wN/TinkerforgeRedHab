@@ -5,15 +5,9 @@ from util.event_logger import EventLogger
 import utilities as util
 
 faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
-video_capture = cv2.VideoCapture(0)
 
-# webcam setup
-video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
-video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
-video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
-
-WIDTH = 92
-HEIGHT = 112
+WIDTH_DB_FACES = 92
+HEIGHT_DB_FACES = 112
 
 def face_detection_webcam(callback):
     '''
@@ -21,11 +15,18 @@ def face_detection_webcam(callback):
     :return:    frame, cleanImages
     '''
 
+    video_capture = cv2.VideoCapture(0)
+
+    # webcam setup
+    video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+
     if video_capture is None or not video_capture.isOpened():
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
 
-    while True:
+    while True: #FIXME: Set timeout for detection
         cleanImages = []
         cleanSizedImages = []
         frame = None
@@ -54,7 +55,7 @@ def face_detection_webcam(callback):
             for (x, y, w, h) in faces:
                 original_face = cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h))
 
-                sized_face = cv2.cv.CreateImage((WIDTH,HEIGHT), 8, 1)
+                sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
                 cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_AREA)
 
                 cleanImages.append(sized_face)
@@ -62,13 +63,6 @@ def face_detection_webcam(callback):
             if len(cleanImages) != 0:
                 break
 
+    video_capture.release()
     # callback on detected face
     callback(frame, cleanImages)
-
-def end_webcam():
-    '''
-    Will close the connection to the webcam
-    :return:
-    '''
-    EventLogger.info("Close connection to the webcam")
-    video_capture.release()
