@@ -6,6 +6,7 @@ import utilities as util
 import threading
 
 faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
+video_capture = None
 
 WIDTH_DB_FACES = 92
 HEIGHT_DB_FACES = 112
@@ -22,18 +23,22 @@ def face_detection_webcam(callback):
     :return:    frame, cleanImages
     '''
     global TIMER_EXIT
-    threading.Timer(10, _stop_webcam).start()
+    global video_capture
 
-    video_capture = cv2.VideoCapture(0)
+    if video_capture is None or not video_capture.isOpened():   # initial start
+        video_capture = cv2.VideoCapture(0)
 
     # webcam setup
     video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
     video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
     video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
 
-    if video_capture is None or not video_capture.isOpened():
+    if not video_capture.isOpened():
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
+
+    exit_timer = threading.Timer(10, _stop_webcam)
+    exit_timer.start()
 
     cleanImages = []
     frame = None
@@ -68,6 +73,7 @@ def face_detection_webcam(callback):
                 cleanImages.append(sized_face)
 
             if len(cleanImages) != 0:
+                exit_timer.cancel()
                 break
 
     video_capture.release()
