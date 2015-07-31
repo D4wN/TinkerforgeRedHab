@@ -14,8 +14,8 @@ if __name__ == '__main__':
 
     p = Profiler("[Profiler:Main]")
     # p._debug_show_profile_list()
-    # p.startProfileRoutine("test", True)
-    p.start_profile_routine("test", False)
+    p.start_profile_routine("test", True)
+    # p.start_profile_routine("test", False)
 
     #1. Start Recognition(THREAD)
     #2. Wait for Answers -> (Recognized Person)

@@ -7,6 +7,8 @@ from util.event_logger import EventLogger
                                 AbstractUpdaterObject
  ---------------------------------------------------------------------------*/
 """
+
+
 class AbstractUpdaterObject():
     def __init__(self, key, value):
         self._key = key
@@ -25,26 +27,32 @@ class AbstractUpdaterObject():
                                 ItemUpdaterObject
  ---------------------------------------------------------------------------*/
 """
+
+
 class ItemUpdaterObject(AbstractUpdaterObject):
     """
     NYI
     """
+
     def __init__(self, key, value):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[ItemUpdaterObject:" + self._key + "," + self._value + "]"
+
 
 """
 /*---------------------------------------------------------------------------
                                 RESTUpdater
  ---------------------------------------------------------------------------*/
 """
+
+
 class RESTUpdater(AbstractUpdaterObject):
     OPENHAB_IP = "192.168.0.32:8080"  # FIXME should be in the profile file?
     # TODO find better solution for inverting values, or resetting them
     KNOWN_VALUE_NEGATIVES = {
         'ON': 'OFF',
         'OFF': 'ON',
-        'TFNUM<00>Hallo: Marvin': 'TFNUM<00>Wiedersehen! '  #TODO Temp only to delte the message
+        'TFNUM<00>Hallo: Marvin': 'TFNUM<00>Wiedersehen! '  # TODO Temp only to delte the message
     }
 
     """
@@ -56,6 +64,7 @@ class RESTUpdater(AbstractUpdaterObject):
     Return:
     None
     """
+
     def __init__(self, key, value, reset_item=False):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[RESTUpdater:" + self._key + "," + self._value + "]"
@@ -63,9 +72,7 @@ class RESTUpdater(AbstractUpdaterObject):
 
     def start(self):
         if self._reset_item:
-            EventLogger.debug("In reset")
             if RESTUpdater.KNOWN_VALUE_NEGATIVES.has_key(self._value):
-                EventLogger.debug("In invert")
                 self._value = RESTUpdater.KNOWN_VALUE_NEGATIVES[self._value]
             else:
                 EventLogger.warning(
@@ -76,7 +83,10 @@ class RESTUpdater(AbstractUpdaterObject):
         try:
             return self.__post_command()
         except Exception as ce:
-            EventLogger.error(self._name + " " + str(ce))
+            # EventLogger.error(self._name + " " + str(ce))
+            EventLogger.warning(
+                "Update Item[" + str(self._key) + "] with Value[" + self._value + "] was NOT successful! Error" + str(
+                    ce))
             return self._name + " " + str(ce)
 
     def __post_command(self):
@@ -90,14 +100,17 @@ class RESTUpdater(AbstractUpdaterObject):
         if req.status_code != requests.codes.ok:
             req.raise_for_status()
 
+        EventLogger.info("Update Item[" + str(self._key) + "] with Value[" + self._value + "] was successful!")
         return "Status: " + str(requests.codes.ok)
 
 
 """
 /*---------------------------------------------------------------------------
-                                RESTUpdater
+                                RuleUpdater
  ---------------------------------------------------------------------------*/
 """
+
+
 class RuleUpdater(AbstractUpdaterObject):
     PATH_RULES_KEY = "PATH_TO_RULES_FILE"
     RULE_START_FORMATTER = "#start#%s#%s#"  # % (key, value)
@@ -113,6 +126,7 @@ class RuleUpdater(AbstractUpdaterObject):
     Return:
     None
     """
+
     def __init__(self, rules, key=None, value=None, remove_rules=False):
         AbstractUpdaterObject.__init__(self, key, value)
         self._rules = rules
@@ -127,8 +141,10 @@ class RuleUpdater(AbstractUpdaterObject):
     On Success      =>  Message(Rules injected!)
     On Error        =>  Error message.
     """
+
     def start(self):
         from profiling.habUpdater import HabUpdater
+
         EventLogger.debug(self._name + " started...")
 
         # check dir for ID entry
@@ -163,7 +179,7 @@ class RuleUpdater(AbstractUpdaterObject):
         with open(self._rules[RuleUpdater.PATH_RULES_KEY], "w") as f:
             f.write(content);
 
-        return self._name + " Rules injected!"
+        return self._name + " Rules updated!"
 
     """
     This function injects a rule into the rules file.
@@ -183,10 +199,10 @@ class RuleUpdater(AbstractUpdaterObject):
         cleaned_content = self.__clean_string(content)  # for simple contains search functionality
 
         if cleaned_rule not in cleaned_content:
-            EventLogger.info(self._name + " Inserted Rule: " + cleaned_rule)
+            EventLogger.info(" Inserted Rule: " + cleaned_rule)
             content += str(rule)
         else:
-            EventLogger.warning(self._name + " Rule already in rules File!")
+            EventLogger.warning("Rule already in rules File! [" + str(self.__get_rule_name(rule)) + "]")
 
         return content
 
@@ -207,10 +223,10 @@ class RuleUpdater(AbstractUpdaterObject):
         cleaned_content = self.__clean_string(content)  # for simple contains search functionality
 
         if cleaned_rule in cleaned_content:
-            EventLogger.info(self._name + " Removed Rule: " + cleaned_rule)
+            EventLogger.info("Removed Rule: " + cleaned_rule)
             content = content.replace(rule, '')  # TODO bettersolution to remove the rule?
         else:
-            EventLogger.warning(self._name + " Rule not in rules File!")
+            EventLogger.warning("Rule not in rules File! [" + str(self.__get_rule_name(rule)) + "]")
 
         return content
 
@@ -224,6 +240,18 @@ class RuleUpdater(AbstractUpdaterObject):
 
     def __clean_string(self, s):
         return s.replace('\n', '').replace('\r', '').replace('\t', '').replace(' ', '')
+
+    def __get_rule_name(self, rule):
+        try:
+            start = rule.index("rule")
+            mid = rule.index("\"", start + 1)  # first "
+            end = rule.index("\"", mid + 1) + 1  # second "
+            # EventLogger.debug("__get_rule_name Start("+str(start)+") Mid("+str(mid)+") End("+str(end)+")")
+            rule = rule[start:end]
+        except ValueError as ve:
+            EventLogger.warning(self._name + " __get_rule_name(...) ValueError: " + str(ve))
+
+        return rule
 
     """
     A Function to log and return an Error.

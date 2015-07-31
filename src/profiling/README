@@ -6,4 +6,5 @@ Important Task to be done before running:
     b) sudo chmod o+w <filename>
 
 
-    "PATH_TO_RULES_FILE": "C:/Programmierung/Workspaces/Python/TinkerforgeRedHab/openHabProfiles/test.rules",
+    "PATH_TO_RULES_FILE": ,
+    "/etc/openhab/configurations/rules/demo.rules"

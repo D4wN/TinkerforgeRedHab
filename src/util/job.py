@@ -73,7 +73,7 @@ class UpdateItemJob(AbstractJob):
 
         EventLogger.debug(str(self._job_name) + " updater=" + str(self._updater))
         ret_value = self._updater.start()
-        EventLogger.info(str(self._job_name) + " " + str(ret_value))
+        EventLogger.debug(str(self._job_name) + " " + str(ret_value))
 
 
 """
@@ -105,4 +105,4 @@ class UpdateRuleJob(AbstractJob):
 
         EventLogger.debug(str(self._job_name) + " updater=" + str(self._updater))
         ret_value = self._updater.start()
-        EventLogger.info(str(self._job_name) + " " + str(ret_value))
+        EventLogger.debug(str(self._job_name) + " " + str(ret_value))

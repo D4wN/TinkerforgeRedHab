@@ -31,13 +31,17 @@ class Profiler():
     """
 
     def start_profile_routine(self, recognized_name, remove_mode=False):
+        EventLogger.info("Profiler started working...")
+        ret_msg = ""
+
         EventLogger.debug(str(self._name) + " Profile Name: " + str(recognized_name))
         # 1. look for profile
         files = self.__get_profile_list()
         if files is None:
             # 1.1 no profile found -> message to main
-            EventLogger.info(str(self._name) + " No Profiles found in " + str(Profiler.PROFILE_LOCATION_PATH))
-            return
+            ret_msg = str(self._name) + " No Profiles found in " + str(Profiler.PROFILE_LOCATION_PATH)
+            EventLogger.info(ret_msg)
+            return ret_msg
 
         found = False
         for f in files:
@@ -56,7 +60,13 @@ class Profiler():
                 break;
 
         if not found:
-            EventLogger.warning(str(self._name) + " Profile(" + str(recognized_name) + ") not found!")
+            ret_msg = str(self._name) + " Profile(" + str(recognized_name) + ") not found!"
+            EventLogger.warning(ret_msg)
+            return ret_msg
+
+        ret_msg = str(self._name) + " Profile(" + str(recognized_name) + ") successfully updated values and rules!"
+        EventLogger.info("Profiler finished working!")
+        return ret_msg
 
     """
     This function will return a list of profile names in a specific folder(currently ../../openHabProfiles)
