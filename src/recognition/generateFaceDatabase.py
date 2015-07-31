@@ -32,5 +32,3 @@ class GenerateFaceDatabase:
 
         except Exception as e:
             EventLogger.error(e)
-        finally:
-            fdw.end_webcam()
