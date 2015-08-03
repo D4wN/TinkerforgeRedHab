@@ -30,7 +30,6 @@ import recognition.faceRecognition as fr
 import recognition.utilities as util
 from random import randint
 
-
 class FaceRecognizer(AbstractRecognizer):
     def __init__(self, gui_component=None):
         self._gui = gui_component
@@ -38,28 +37,32 @@ class FaceRecognizer(AbstractRecognizer):
 
         self._profiler = Profiler("[Profiler:Main]")
 
-    def recognize(self, args=None):
+    def recognize(self, cb, args=None):
+        recognized_name = None
+
         if args is None:
             EventLogger.warning(self._name + " did not get any args!")
-            return None
+            cb("NO NAME")
 
         if len(args) != 2:
             EventLogger.error("Please start this Program with the parameter 1 or 0")
-            return None
+            cb("NO NAME")
 
         if args[1] == "1":  # ------------------------------------------------| Create_Database_Mode
             EventLogger.info("Start Mode 1: Create Face Database")
             fdb = gfd.GenerateFaceDatabase("Roland")
             fdb.generate_face_database()
+            cb("NO NAME")
 
         elif args[1] == "2":  # ------------------------------------------------| Face_Recognition_Mode
             EventLogger.info("Start Mode 2: Face Recognition")
-            fr_instance = fr.faceRecognition(self.cb_recognize)
+            fr_instance = fr.faceRecognition(cb)
             fr_instance.start_process()
 
         else:  # -----------------------------------------------------------------| Face_Detection_Mode
             EventLogger.info("Start Mode default: Detecting Faces")
             start_new_thread(face_detection_webcam, (self.__found_face,))
+            cb("NO NAME")
 
 
     def __found_face(self, frame, faces):
@@ -89,7 +92,6 @@ class FaceRecognizer(AbstractRecognizer):
         p.start_profile_routine(recognized_name, False)
 
 
-
 class TestRecognizer(AbstractRecognizer):
     def __init__(self):
         AbstractRecognizer.__init__(self)
@@ -102,6 +104,7 @@ class TestRecognizer(AbstractRecognizer):
         print "DO SOomething else 2"
         sleep(2)
         print "DO SOomething finished"
+
         cb("MyName")
 
     def cb_recognize(self, recognized_name):

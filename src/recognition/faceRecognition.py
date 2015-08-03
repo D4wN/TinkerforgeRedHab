@@ -85,7 +85,7 @@ class faceRecognition:
             sized_face = None
             input_image = self.read_matrix_from_file(path_file)
 
-            height, width, channels = input_image.shape
+            width, height = cv2.cv.GetSize(cv2.cv.fromarray(input_image))
             if height != HEIGHT_DB_FACES or width != WIDTH_DB_FACES:
                 sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
                 cv2.cv.Resize(input_image, sized_face, interpolation=cv2.cv.CV_INTER_CUBIC)
