@@ -15,7 +15,7 @@ if __name__ == '__main__':
     __init_event_logging()
 
     runner = RecognitionRunner(FaceRecognizer())
-    runner.start(["2"])
+    runner.start([None, "2"])
 
 """OLD
     p = Profiler("[Profiler:Main]")
