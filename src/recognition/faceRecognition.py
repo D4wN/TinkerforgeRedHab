@@ -9,6 +9,9 @@ import faceDetectionWebcam as fdw
 
 EventLogger.add_logger(ConsoleLogger("ConsoleLogger", EventLogger.EVENT_LOG_LEVEL))
 
+WIDTH_DB_FACES = 92
+HEIGHT_DB_FACES = 112
+
 class faceRecognition:
     def __init__(self, recognizied_callback):
         self.face_recognized_callback = recognizied_callback
@@ -79,7 +82,17 @@ class faceRecognition:
             path_file = "./recognition/tmp/" + str(rnd) + ".pgm"
             util.save_image(path_file, img)
 
-            predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(self.read_matrix_from_file(path_file))
+            sized_face = None
+            input_image = self.read_matrix_from_file(path_file)
+
+            height, width, channels = input_image.shape
+            if height != HEIGHT_DB_FACES or width != WIDTH_DB_FACES:
+                sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
+                cv2.cv.Resize(input_image, sized_face, interpolation=cv2.cv.CV_INTER_CUBIC)
+            else:
+                sized_face = input_image
+
+            predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
             cv2.imshow("webcam_face", self.read_matrix_from_file(path_file))
 
             #predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(self.read_matrix_from_file(path_file))
