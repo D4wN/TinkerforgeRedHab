@@ -30,8 +30,6 @@ class faceRecognition:
         #FIXME: If there is a model and nothing changed -> load the model
         # Else:
         self.model_eigenfaces.train(label_matrix.values(), np.array(label_matrix.keys()))
-        #self.model_fisherfaces.train(label_matrix.values(), np.array(label_matrix.keys()))
-        #self.model_lbph.train(label_matrix.values(), np.array(label_matrix.keys()))
 
         '''
         try:
@@ -84,8 +82,8 @@ class faceRecognition:
 
             sized_face = None
             input_image = self.read_matrix_from_file(path_file)
-
             width, height = cv2.cv.GetSize(cv2.cv.fromarray(input_image))
+
             if height != HEIGHT_DB_FACES or width != WIDTH_DB_FACES:
                 sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
                 cv2.cv.Resize(input_image, sized_face, interpolation=cv2.cv.CV_INTER_CUBIC)
@@ -93,14 +91,7 @@ class faceRecognition:
                 sized_face = input_image
 
             predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
-            cv2.imshow("webcam_face", self.read_matrix_from_file(path_file))
-
-            #predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(self.read_matrix_from_file(path_file))
-            #predicted_label_lbph, conf_lbph = self.model_lbph.predict(self.read_matrix_from_file(path_file))
-
             EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
-            #EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
-            #EventLogger.info('LBPH: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_lbph, "confidence ":conf_lbph})
 
             try:
                 os.remove(path_file)
