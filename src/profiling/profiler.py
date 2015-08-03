@@ -60,7 +60,7 @@ class Profiler():
                 break;
 
         if not found:
-            ret_msg = str(self._name) + " Profile(" + str(recognized_name) + ") not found!"
+            ret_msg = "Profile(" + str(recognized_name) + ") not found!"
             EventLogger.warning(ret_msg)
             return ret_msg
 

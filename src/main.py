@@ -1,6 +1,8 @@
 import sys
+from recognition.recognition_runner import RecognitionRunner
+from recognition.recognizer import TestRecognizer
 
-print sys.path
+# print sys.path
 
 from profiling.profiler import Profiler
 from util.event_logger import EventLogger, ConsoleLogger
@@ -12,6 +14,10 @@ def __init_event_logging():
 if __name__ == '__main__':
     __init_event_logging()
 
+    runner = RecognitionRunner(TestRecognizer())
+    runner.start(["Test Args", "Second Test"])
+
+"""OLD
     p = Profiler("[Profiler:Main]")
     # p._debug_show_profile_list()
     p.start_profile_routine("test", True)
@@ -22,3 +28,4 @@ if __name__ == '__main__':
     #3. Profiling(THREAD)
     #4. Wait for Answers -> (Profile Update Status)
     #??? Profit
+    """
