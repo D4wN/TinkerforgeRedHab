@@ -1,6 +1,6 @@
 import sys
 from recognition.recognition_runner import RecognitionRunner
-from recognition.recognizer import TestRecognizer
+from recognition.recognizer import FaceRecognizer
 
 # print sys.path
 
@@ -14,8 +14,8 @@ def __init_event_logging():
 if __name__ == '__main__':
     __init_event_logging()
 
-    runner = RecognitionRunner(TestRecognizer())
-    runner.start(["Test Args", "Second Test"])
+    runner = RecognitionRunner(FaceRecognizer())
+    runner.start(["2"])
 
 """OLD
     p = Profiler("[Profiler:Main]")
