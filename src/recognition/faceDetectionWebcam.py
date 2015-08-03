@@ -30,8 +30,8 @@ def face_detection_webcam(callback):
 
     # webcam setup
     video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
-    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
-    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 640)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
 
     if not video_capture.isOpened():
         EventLogger.error("ERROR: Can't connect to Webcam")
@@ -68,7 +68,7 @@ def face_detection_webcam(callback):
                 original_face = cv2.cv.GetSubRect(cv2.cv.fromarray(gryFrame), (x, y, w, h))
 
                 sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
-                cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_AREA)
+                cv2.cv.Resize(original_face, sized_face, interpolation=cv2.cv.CV_INTER_CUBIC)
 
                 cleanImages.append(sized_face)
 
