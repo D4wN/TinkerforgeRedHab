@@ -1,7 +1,9 @@
 from tinkerforge.bricklet_dual_button import DualButton
+from tinkerforge.bricklet_nfc_rfid import NFCRFID
 from tinkerforge.ip_connection import IPConnection
 from util.event_logger import EventLogger
 from util.singleton import Singleton
+from util.utils import Utils
 
 """
 /*---------------------------------------------------------------------------
@@ -15,7 +17,6 @@ class GuiControl():
     def __init__(self):
         self._name = "[GuiControl]"
 
-        print "GuiController TODO"
         # ipcon
         self._ipcon = None
         self._HOST = "localhost"
@@ -29,6 +30,11 @@ class GuiControl():
         #TODO bad idea?
         self.recognition_progress = False
 
+        # NFC/RFID
+        self._nfc = None
+        self._NFC_UID = "oDg"
+        self._nfc_cb_to_profiler = None
+
 
     def start_ipcon(self):
         if self._ipcon != None:
@@ -39,6 +45,7 @@ class GuiControl():
 
         # Init Components
         self._db = DualButton(self._DB_UID, self._ipcon)
+        self._nfc = NFCRFID(self._NFC_UID, self._ipcon)
 
         try:
             self._ipcon.connect(self._HOST, self._PORT)
@@ -48,6 +55,8 @@ class GuiControl():
 
         #Init Callbacks
         self._db.register_callback(DualButton.CALLBACK_STATE_CHANGED, self.__cb_db_state_changed)
+        self._nfc.register_callback(self._nfc.CALLBACK_STATE_CHANGED,
+                                    lambda x, y: self.__cb_nfc_state_changed(x, y, self._nfc))
 
     def stop_ipcon(self):
         if self._ipcon == None:
@@ -88,6 +97,44 @@ class GuiControl():
         self._db.set_selected_led_state(DualButton.LED_LEFT, DualButton.LED_STATE_OFF)
         self.recognition_state = False
         self.recognition_progress = False
+
+    def __cb_nfc_state_changed(self, state, idle, nr):
+        name = "NO NAME"
+
+        if state == nr.STATE_REQUEST_TAG_ID_READY:
+            EventLogger.debug('Tag found')
+
+            # Write 16 byte to pages 5-8
+            # 16 buchstaben
+
+            # data_write = Utils.string_to_byte_array("Marvin Lutz")
+            #nr.write_page(5, data_write)
+            #EventLogger.debug('Writing data...')
+
+            #elif state == nr.STATE_WRITE_PAGE_READY: #only when writing before!
+            # Request pages 5-8
+            nr.request_page(5)
+            EventLogger.debug('Requesting data...')
+
+        elif state == nr.STATE_REQUEST_PAGE_READY:
+            # Get and print pages
+            data = nr.get_page()
+            name = str(Utils.byte_array_to_string(data))
+            EventLogger.debug('Read data:' + name)
+
+            if self._nfc_cb_to_profiler != None:
+                self._nfc_cb_to_profiler(name)
+
+        elif state & (1 << 6):
+            # All errors have bit 6 set
+            if state == self._nfc.STATE_REQUEST_TAG_ID_ERROR:
+                EventLogger.info(
+                    'No NFC/RFID Tag found! TODO: Message - Token @ Lesegereat -> Button')  # TODO: Message - Token @ Lesegeraet -> Button
+            else:
+                EventLogger.debug('Error: ' + str(state))
+
+                # TODO check for errors in coding!
+                #EventLogger.error(self._name + "_nfc_cb_to_profiler was None! DEBUG ONLY!")
 
     def _debug_print(self):
         print "self.recognition_running  = " + str(self.recognition_running) + "\nself.recognition_state    = " + str(
