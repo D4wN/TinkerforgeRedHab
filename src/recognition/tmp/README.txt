@@ -1,0 +1,1 @@
+This directory stores temporary images from the webcam
