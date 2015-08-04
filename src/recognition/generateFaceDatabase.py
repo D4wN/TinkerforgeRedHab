@@ -39,5 +39,8 @@ class GenerateFaceDatabase:
             csvPath = "./recognition/faceDatabase"
             util.create_csv(csvPath)
 
+            fr = fre.faceRecognition(self._duplicated_index_check)
+            fr.update_model()
+
         except Exception as e:
             EventLogger.error(e)
