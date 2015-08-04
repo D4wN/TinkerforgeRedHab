@@ -34,6 +34,8 @@ class GuiControl():
         self._nfc = None
         self._NFC_UID = "oDg"
         self._nfc_cb_to_profiler = None
+        self._nfc_write_mode = False
+        self._nfc_write_name = None
 
 
     def start_ipcon(self):
@@ -105,13 +107,16 @@ class GuiControl():
             EventLogger.debug('Tag found')
 
             # Write 16 byte to pages 5-8
-            # 16 buchstaben
+            if self._nfc_write_mode:
+                data_write = Utils.string_to_byte_array(self._nfc_write_name)
+                nr.write_page(5, data_write)
+                EventLogger.debug('Writing data...')
+            else:
+                nr.request_page(5)
+                EventLogger.debug('Requesting data...2')
 
-            # data_write = Utils.string_to_byte_array("Marvin Lutz")
-            #nr.write_page(5, data_write)
-            #EventLogger.debug('Writing data...')
 
-            #elif state == nr.STATE_WRITE_PAGE_READY: #only when writing before!
+        elif state == nr.STATE_WRITE_PAGE_READY:  # only when writing before!
             # Request pages 5-8
             nr.request_page(5)
             EventLogger.debug('Requesting data...')

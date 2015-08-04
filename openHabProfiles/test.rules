@@ -45,3 +45,15 @@ rule "Hallo Welt2" shit happened again! end
 //#start#0815#test#
 rule "Weather Station LCD Backlight" when Item TF_Button0 changed then if (TF_LCD_Backlight.state == ON) sendCommand(TF_LCD_Backlight, OFF) else sendCommand(TF_LCD_Backlight, ON) end
 //#end#0815#test#
+
+//#start#0815#MarvinLutz#
+rule "Hallo Welt rule" when shit happens end
+//#end#0815#MarvinLutz#
+
+//#start#0815#MarvinLutz#
+rule "Hallo Welt2" shit happened again! end
+//#end#0815#MarvinLutz#
+
+//#start#0815#MarvinLutz#
+rule "Weather Station LCD Backlight" when Item TF_Button0 changed then if (TF_LCD_Backlight.state == ON) sendCommand(TF_LCD_Backlight, OFF) else sendCommand(TF_LCD_Backlight, ON) end
+//#end#0815#MarvinLutz#

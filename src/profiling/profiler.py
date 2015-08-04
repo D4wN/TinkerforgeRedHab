@@ -1,5 +1,6 @@
 import codecs
 import os
+from thread import start_new_thread
 from profiling.habUpdater import HabUpdater
 from util.event_logger import EventLogger
 
@@ -32,6 +33,9 @@ class Profiler():
 
     def start_profile_routine(self, recognized_name, remove_mode=False):
         EventLogger.info("Profiler started working...")
+        start_new_thread(self.__profiler_thread, (recognized_name, remove_mode, ))
+
+    def __profiler_thread(self, recognized_name, remove_mode=False):
         ret_msg = ""
 
         EventLogger.debug(str(self._name) + " Profile Name: " + str(recognized_name))

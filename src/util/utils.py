@@ -11,9 +11,6 @@ class Utils:
             for x in range(0, 16 - len(name)):
                 name += " "
 
-        print name
-        print str(len(name))
-
         return list(bytearray(name))
 
     @staticmethod
