@@ -38,7 +38,7 @@ def face_detection_webcam(callback):
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
 
-    exit_timer = threading.Timer(10, _stop_webcam)
+    exit_timer = threading.Timer(60, _stop_webcam)
     exit_timer.start()
 
     cleanImages = []

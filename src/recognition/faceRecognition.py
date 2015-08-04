@@ -85,8 +85,11 @@ class faceRecognition:
         return cv2.imread(filename, cv2.CV_LOAD_IMAGE_GRAYSCALE)
 
     def _recognize_face(self,frame, faces):
-        self.load_model()
+        if len(faces) == 0:
+            self.face_recognized_callback("No-Index")
+            return
 
+        self.load_model()
         for img in faces:
             rnd = random.randint(0, 10000000)
             path_file = "./recognition/tmp/" + str(rnd) + ".pgm"
@@ -120,7 +123,7 @@ class faceRecognition:
 
             index = util.get_id_of_index( self.csvPath, predicted_label_lbph)
             self.face_recognized_callback(index)
-            EventLogger.info("Face recognition finished")
+        EventLogger.info("Face recognition finished")
 
     def start_process(self):
         util.create_csv(self.csvPath)
