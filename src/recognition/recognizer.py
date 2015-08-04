@@ -179,7 +179,7 @@ class TestRecognizer(AbstractRecognizer):
     def cb_recognize(self, recognized_name):
         print "callbacked: " + str(recognized_name)
         p = Profiler("[Profiler-Main]")
-        p.start_profile_routine(recognized_name, False)
+        p.start_profile_routine(recognized_name, True)
         #self._gui._db_recognizer_state_off()
 
 

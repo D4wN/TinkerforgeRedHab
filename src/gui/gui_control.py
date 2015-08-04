@@ -112,8 +112,8 @@ class GuiControl():
                 nr.write_page(5, data_write)
                 EventLogger.debug('Writing data...')
             else:
-                print "else mode"
-                state = nr.STATE_WRITE_PAGE_READY  # FIXME baaad workaround!
+                nr.request_page(5)
+                EventLogger.debug('Requesting data...2')
 
 
         elif state == nr.STATE_WRITE_PAGE_READY:  # only when writing before!
