@@ -45,14 +45,17 @@ def create_csv(basePath):
     SEPARATOR=";"
 
     f = open(basePath + "/faces.csv", 'w')
+    if not f.closed:
+        label = 1
+        for dirname, dirnames, filenames in os.walk(basePath):
+            for subdirname in dirnames:
+                subject_path = os.path.join(dirname, subdirname)
+                for filename in os.listdir(subject_path):
+                    abs_path = "%s%s%s" % (subject_path, os.sep, filename)
+                    f.write(str(abs_path) + " " + str(SEPARATOR) + " " + str(label) + "\n")
+                label += 1
+        f.close()
+    else:
+        EventLogger.error("create_csv: Can't create csv-file")
 
-    label = 1
-    for dirname, dirnames, filenames in os.walk(basePath):
-        for subdirname in dirnames:
-            subject_path = os.path.join(dirname, subdirname)
-            for filename in os.listdir(subject_path):
-                abs_path = "%s%s%s" % (subject_path, os.sep, filename)
-                f.write(str(abs_path) + " " + str(SEPARATOR) + " " + str(label) + "\n")
-            label += 1
-
-    f.close()
+    EventLogger.info("create_csv: End")

@@ -17,8 +17,8 @@ class faceRecognition:
         self.face_recognized_callback = recognizied_callback
         # select mode for the face recognition
 
-        self.model_eigenfaces = cv2.createEigenFaceRecognizer()
-        self.model_fisherfaces = cv2.createFisherFaceRecognizer()
+        #self.model_eigenfaces = cv2.createEigenFaceRecognizer()
+        #self.model_fisherfaces = cv2.createFisherFaceRecognizer()
         self.model_lbph = cv2.createLBPHFaceRecognizer()
 
         sep = os.sep
@@ -26,16 +26,15 @@ class faceRecognition:
 
     def update_model(self):
         training_data = self.read_csv((self.csvPath + "faces.csv")).readlines()
-
         data_dict = self.create_label_matrix_dict(training_data)
 
-        self.model_eigenfaces.train(data_dict.values(), np.array(data_dict.keys()))
-        self.model_fisherfaces.train(data_dict.values(), np.array(data_dict.keys()))
+        #self.model_eigenfaces.train(data_dict.values(), np.array(data_dict.keys()))
+        #self.model_fisherfaces.train(data_dict.values(), np.array(data_dict.keys()))
         self.model_lbph.train(data_dict.values(), np.array(data_dict.keys()))
 
         try:
-            self.model_eigenfaces.save(self.csvPath + "eigenface-model.xml")
-            self.model_fisherfaces.save(self.csvPath + "fisherfaces-model.xml")
+            #self.model_eigenfaces.save(self.csvPath + "eigenface-model.xml")
+            #self.model_fisherfaces.save(self.csvPath + "fisherfaces-model.xml")
             self.model_lbph.save(self.csvPath + "lbph-model.xml")
 
         except Exception as e:
@@ -43,9 +42,9 @@ class faceRecognition:
 
     def load_model(self):
         try:
-            if os.path.isfile(self.csvPath + "eigenface-model.xml"):
-                self.model_eigenfaces.load(self.csvPath + "eigenface-model.xml")
-                self.model_fisherfaces.load(self.csvPath + "fisherfaces-model.xml")
+            if os.path.isfile(self.csvPath + "lbph-model.xml"):
+                #self.model_eigenfaces.load(self.csvPath + "eigenface-model.xml")
+                #self.model_fisherfaces.load(self.csvPath + "fisherfaces-model.xml")
                 self.model_lbph.load(self.csvPath + "lbph-model.xml")
 
             else:
@@ -102,12 +101,12 @@ class faceRecognition:
                 sized_face = input_image
 
             # actual face recognition
-            predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
-            predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(sized_face)
+            #predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
+            #predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(sized_face)
             predicted_label_lbph, conf_lbph = self.model_lbph.predict(sized_face)
 
-            EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
-            EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
+            #EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
+            #EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
             EventLogger.info('LBPH: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_lbph, "confidence ":conf_lbph})
 
             try:
@@ -115,9 +114,9 @@ class faceRecognition:
             except Exception as e:
                 EventLogger.error(e)
 
-            index = util.get_id_of_index( self.csvPath, predicted_label_eigenfaces)
+            index = util.get_id_of_index( self.csvPath, predicted_label_lbph)
             self.face_recognized_callback(index)
 
     def start_process(self):
-        util.create_csv( self.csvPath)
+        util.create_csv(self.csvPath)
         fdw.face_detection_webcam(self._recognize_face)
