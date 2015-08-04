@@ -25,6 +25,7 @@ class faceRecognition:
         self.csvPath = ".%srecognition%sfaceDatabase%s" % (sep,sep,sep)
 
     def update_model(self):
+        EventLogger.info("Face recognition training started")
         training_data = self.read_csv((self.csvPath + "faces.csv")).readlines()
         data_dict = self.create_label_matrix_dict(training_data)
 
@@ -40,13 +41,15 @@ class faceRecognition:
         except Exception as e:
             EventLogger.error(e)
 
+        EventLogger.info("Face recognition training finished")
+
     def load_model(self):
         try:
             if os.path.isfile(self.csvPath + "lbph-model.xml"):
                 #self.model_eigenfaces.load(self.csvPath + "eigenface-model.xml")
                 #self.model_fisherfaces.load(self.csvPath + "fisherfaces-model.xml")
                 self.model_lbph.load(self.csvPath + "lbph-model.xml")
-
+                EventLogger.info("Loaded face rec-model: " + self.csvPath + "lbph-model.xml")
             else:
                 raise Exception("No model was found. Will create a new one")
 
@@ -103,6 +106,7 @@ class faceRecognition:
             # actual face recognition
             #predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
             #predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(sized_face)
+            EventLogger.info("Started prediction")
             predicted_label_lbph, conf_lbph = self.model_lbph.predict(sized_face)
 
             #EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
@@ -116,6 +120,7 @@ class faceRecognition:
 
             index = util.get_id_of_index( self.csvPath, predicted_label_lbph)
             self.face_recognized_callback(index)
+            EventLogger.info("Face recognition finished")
 
     def start_process(self):
         util.create_csv(self.csvPath)

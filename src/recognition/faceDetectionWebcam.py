@@ -16,6 +16,7 @@ TIMER_EXIT = False
 def _stop_webcam():
     global TIMER_EXIT
     TIMER_EXIT = True
+    EventLogger.info("Webcam timeout reached")
 
 def face_detection_webcam(callback):
     '''
@@ -73,6 +74,7 @@ def face_detection_webcam(callback):
                 cleanImages.append(sized_face)
 
             if len(cleanImages) != 0:
+                EventLogger.info("Face/es detected " + str(len(cleanImages)) )
                 exit_timer.cancel()
                 break
 
