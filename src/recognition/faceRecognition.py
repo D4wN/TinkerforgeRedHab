@@ -103,12 +103,11 @@ class faceRecognition:
 
             # actual face recognition
             predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
-            EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
-
             predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(sized_face)
-            EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
-
             predicted_label_lbph, conf_lbph = self.model_lbph.predict(sized_face)
+
+            EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
+            EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
             EventLogger.info('LBPH: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_lbph, "confidence ":conf_lbph})
 
             try:

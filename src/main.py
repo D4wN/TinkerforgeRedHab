@@ -73,8 +73,11 @@ def cb_state_changed(state, idle, nr):
 
 
 if __name__ == "__main__":
-    runner = RecognitionRunner(NfcRfidRecognizer())
-    runner.start(None)
+    #runner = RecognitionRunner(NfcRfidRecognizer())
+    #runner.start(None)
+
+    runner = RecognitionRunner(FaceRecognizer())
+    runner.start([None, 2])
 
 """
     name = "Marvin Lutz"

@@ -48,13 +48,13 @@ class FaceRecognizer(AbstractRecognizer):
             EventLogger.error("Please start this Program with the parameter 1 or 0")
             cb("NO NAME")
 
-        if args[1] == "1":  # ------------------------------------------------| Create_Database_Mode
+        if args[1] == 1:  # ------------------------------------------------| Create_Database_Mode
             EventLogger.info("Start Mode 1: Create Face Database")
             fdb = gfd.GenerateFaceDatabase("Roland")
             fdb.generate_face_database()
             cb("NO NAME")
 
-        elif args[1] == "2":  # ------------------------------------------------| Face_Recognition_Mode
+        elif args[1] == 2:  # ------------------------------------------------| Face_Recognition_Mode
             EventLogger.info("Start Mode 2: Face Recognition")
             fr_instance = fr.faceRecognition(cb)
             fr_instance.start_process()
