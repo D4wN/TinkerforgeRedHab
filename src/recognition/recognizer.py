@@ -32,9 +32,9 @@ from random import randint
 
 class FaceRecognizer(AbstractRecognizer):
     def __init__(self, gui_component=None):
-        self._gui = gui_component
-        self._name = "[FaceRecognizer]"
+        AbstractRecognizer.__init__(self)
 
+        self._name = "[FaceRecognizer]"
         self._profiler = Profiler("[Profiler:Main]")
 
     def recognize(self, cb, args=None):
@@ -90,6 +90,62 @@ class FaceRecognizer(AbstractRecognizer):
         print "callbacked: " + str(recognized_name)
         p = Profiler("[Profiler-Main]")
         p.start_profile_routine(recognized_name, False)
+
+
+"""
+/*---------------------------------------------------------------------------
+                                NfcRfidRecognizer
+ ---------------------------------------------------------------------------*/
+"""
+
+
+class NfcRfidRecognizer(AbstractRecognizer):
+    def __init__(self):
+        AbstractRecognizer.__init__(self)
+
+        self._name = "[NfcRfidRecognizer]"
+        self._profiler = Profiler("[Profiler-NfcRfidRecognizer]")
+        # self._gui._nfc_init()
+
+        self._counter = 0
+        self._exit_timer = None
+        self._exit_cb = None
+
+    def recognize(self, cb, args=None):
+        EventLogger.info("NFC/RFID Recognizer started...")
+        self._counter = 0
+
+        if self._gui._nfc is None:
+            EventLogger.warning(self._name + " NFC/RFID Component was initialized!")
+
+        # Rufe request_tag_id() auf
+
+        self._gui._nfc_cb_to_profiler = cb
+        self._exit_cb = cb
+
+        self._gui._nfc.request_tag_id(self._gui._nfc.TAG_TYPE_TYPE2)
+        self._exit_timer = threading.Timer(2, self.__cb_retry)
+        self._exit_timer.start()
+
+    def cb_recognize(self, recognized_name):
+        self._exit_timer.cancel()
+        EventLogger.debug(self._name + " cd_recognized= " + str(recognized_name))
+        EventLogger.info("NFC/RFID Recognizer finished...")
+
+    def __cb_retry(self):
+        EventLogger.info("Try to read the Tag...")
+        # print "Counter: " + str(self._counter)
+
+        if self._counter >= 5:
+            EventLogger.info("Tried 5 times to read the Tag!")
+            self._exit_cb("NO NAME")
+            return
+
+        self._counter += 1
+        self._gui._nfc.request_tag_id(self._gui._nfc.TAG_TYPE_TYPE2)
+        # TODO thread.restart?
+        self._exit_timer = threading.Timer(2, self.__cb_retry)
+        self._exit_timer.start()
 
 
 class TestRecognizer(AbstractRecognizer):
