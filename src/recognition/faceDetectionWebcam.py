@@ -5,7 +5,7 @@ from util.event_logger import EventLogger
 import utilities as util
 import threading
 
-faceCascade = cv2.CascadeClassifier('./recognition/res/haarcascade_frontalface_alt.xml')
+faceCascade = cv2.CascadeClassifier()
 video_capture = None
 
 WIDTH_DB_FACES = 92
@@ -37,6 +37,10 @@ def face_detection_webcam(callback):
     if not video_capture.isOpened():
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
+
+    if not faceCascade.load('./recognition/res/haarcascade_frontalface_alt.xml'):
+        EventLogger.error("Can't load haarcascade file")
+        sys.exit(1) #FIXME: other type of return
 
     exit_timer = threading.Timer(60, _stop_webcam)
     exit_timer.start()
