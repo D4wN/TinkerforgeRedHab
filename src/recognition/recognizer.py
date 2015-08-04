@@ -1,6 +1,7 @@
 from gui.gui_control import GuiControl
 from util.event_logger import EventLogger
 from profiling.profiler import Profiler
+from util.utils import Utils
 
 """
 /*---------------------------------------------------------------------------
@@ -31,7 +32,7 @@ import recognition.utilities as util
 from random import randint
 
 class FaceRecognizer(AbstractRecognizer):
-    def __init__(self, gui_component=None):
+    def __init__(self):
         AbstractRecognizer.__init__(self)
 
         self._name = "[FaceRecognizer]"
@@ -88,8 +89,7 @@ class FaceRecognizer(AbstractRecognizer):
 
     def cb_recognize(self, recognized_name):
         print "callbacked: " + str(recognized_name)
-        p = Profiler("[Profiler-Main]")
-        p.start_profile_routine(recognized_name, False)
+        self._profiler.start_profile_routine(recognized_name, False)
 
 
 """
@@ -112,6 +112,9 @@ class NfcRfidRecognizer(AbstractRecognizer):
         self._exit_cb = None
 
     def recognize(self, cb, args=None):
+        if args != None:
+            self.__write_mode(args[0])
+
         EventLogger.info("NFC/RFID Recognizer started...")
         self._counter = 0
 
@@ -129,8 +132,14 @@ class NfcRfidRecognizer(AbstractRecognizer):
 
     def cb_recognize(self, recognized_name):
         self._exit_timer.cancel()
+        self._gui._nfc_write_name = None
+        self._gui._nfc_write_mode = False
+
         EventLogger.debug(self._name + " cd_recognized= " + str(recognized_name))
         EventLogger.info("NFC/RFID Recognizer finished...")
+
+        if recognized_name != "NO NAME":
+            self._profiler.start_profile_routine(recognized_name)
 
     def __cb_retry(self):
         EventLogger.info("Try to read the Tag...")
@@ -147,6 +156,10 @@ class NfcRfidRecognizer(AbstractRecognizer):
         self._exit_timer = threading.Timer(2, self.__cb_retry)
         self._exit_timer.start()
 
+    def __write_mode(self, name):
+        EventLogger.info("NFC/RFID write Mode: Writing " + str(name) + " to the Tag.")
+        self._gui._nfc_write_name = name
+        self._gui._nfc_write_mode = True
 
 class TestRecognizer(AbstractRecognizer):
     def __init__(self):
