@@ -22,14 +22,15 @@ def create_dir(name):
 
     return path
 
-def get_id_of_index(basePath, index):
-    f = open(basePath + "/faces.csv", 'r')
+def get_real_user(basePath, index):
+    f = open(basePath + "faces.csv", 'r')
     content = f.readlines()
     user_index = None
 
     for line in content:
         split = line.split(";")
         path = split[0]
+        path = path.replace("\\", os.sep)
         id = split[1]
 
         if int(id) == index:
