@@ -36,7 +36,7 @@ class ItemUpdaterObject(AbstractUpdaterObject):
 
     def __init__(self, key, value):
         AbstractUpdaterObject.__init__(self, key, value)
-        self._name = "[ItemUpdaterObject:" + self._key + "," + self._value + "]"
+        self._name = "[ItemUpdaterObject:" + str(self._key) + "," + str(self._value) + "]"
 
 
 """
@@ -47,7 +47,8 @@ class ItemUpdaterObject(AbstractUpdaterObject):
 
 
 class RESTUpdater(AbstractUpdaterObject):
-    OPENHAB_IP = "192.168.0.32:8080"  # FIXME should be in the profile file?
+    # OPENHAB_IP = "192.168.0.32:8080"  # FIXME should be in the profile file?
+    OPENHAB_IP = "localhost:8080"  # FIXME DEMO URL ONLY!
     # TODO find better solution for inverting values, or resetting them
     KNOWN_VALUE_NEGATIVES = {
         'ON': 'OFF',
@@ -67,7 +68,7 @@ class RESTUpdater(AbstractUpdaterObject):
 
     def __init__(self, key, value, reset_item=False):
         AbstractUpdaterObject.__init__(self, key, value)
-        self._name = "[RESTUpdater:" + self._key + "," + self._value + "]"
+        self._name = "[RESTUpdater:" + str(self._key) + "," + str(self._value) + "]"
         self._reset_item = reset_item
 
     def start(self):
@@ -76,7 +77,8 @@ class RESTUpdater(AbstractUpdaterObject):
                 self._value = RESTUpdater.KNOWN_VALUE_NEGATIVES[self._value]
             else:
                 EventLogger.warning(
-                    self._name + " POST[key:" + self._key + "|value:" + self._value + "] Could not reset! No known invert value found!")
+                    self._name + " POST[key:" + str(self._key) + "|value:" + str(
+                        self._value) + "] Could not reset! No known invert value found!")
                 return self._name + " No known invert value found! Item could not reset"
 
         # EventLogger.debug(self._name + " started...")
@@ -85,14 +87,15 @@ class RESTUpdater(AbstractUpdaterObject):
         except Exception as ce:
             # EventLogger.error(self._name + " " + str(ce))
             EventLogger.warning(
-                "Update Item[" + str(self._key) + "] with Value[" + self._value + "] was NOT successful! Error" + str(
+                "Update Item[" + str(self._key) + "] with Value[" + str(
+                    self._value) + "] was NOT successful! Error: " + str(
                     ce))
             return self._name + " " + str(ce)
 
     def __post_command(self):
-        EventLogger.debug(self._name + " POST[key:" + self._key + "|value:" + self._value + "]")
+        EventLogger.debug(self._name + " POST[key:" + str(self._key) + "|value:" + str(self._value) + "]")
         header = {'Content-Type': 'text/plain'}
-        url = 'http://%s/rest/items/%s' % (RESTUpdater.OPENHAB_IP, self._key)
+        url = 'http://%s/rest/items/%s' % (RESTUpdater.OPENHAB_IP, str(self._key))
         # print "URL  :" + str(url)
         # print "DATA :" + str(self._value)
 
@@ -100,7 +103,7 @@ class RESTUpdater(AbstractUpdaterObject):
         if req.status_code != requests.codes.ok:
             req.raise_for_status()
 
-        EventLogger.info("Update Item[" + str(self._key) + "] with Value[" + self._value + "] was successful!")
+        EventLogger.info("Update Item[" + str(self._key) + "] with Value[" + str(self._value) + "] was successful!")
         return "Status: " + str(requests.codes.ok)
 
 
