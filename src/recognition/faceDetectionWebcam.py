@@ -29,14 +29,14 @@ def face_detection_webcam(callback):
     if video_capture is None or not video_capture.isOpened():   # initial start
         video_capture = cv2.VideoCapture(0)
 
-    # webcam setup
-    video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
-    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 640)
-    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
-
     if not video_capture.isOpened():
         EventLogger.error("ERROR: Can't connect to Webcam")
         sys.exit(1)
+
+    # webcam setup
+    video_capture.set(cv2.cv.CV_CAP_PROP_FPS, 5)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+    video_capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
 
     if not faceCascade.load('./recognition/res/haarcascade_frontalface_alt.xml'):
         EventLogger.error("Can't load haarcascade file")
@@ -54,10 +54,7 @@ def face_detection_webcam(callback):
             continue
 
         _, frame = video_capture.retrieve()
-        # _, frame = video_capture.read()
         if frame is not None:
-            # numpy.ndarray is the type of the output
-            # FIXME: should be checked (maxSize  and minSize)
             faces = faceCascade.detectMultiScale(
                 cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
                 scaleFactor=1.1,
@@ -78,7 +75,7 @@ def face_detection_webcam(callback):
                 cleanImages.append(sized_face)
 
             if len(cleanImages) != 0:
-                EventLogger.info("Face/es detected " + str(len(cleanImages)) )
+                EventLogger.info("Face/s detected " + str(len(cleanImages)))
                 exit_timer.cancel()
                 break
 

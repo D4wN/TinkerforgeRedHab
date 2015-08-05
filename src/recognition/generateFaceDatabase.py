@@ -35,10 +35,7 @@ class GenerateFaceDatabase:
             for i in range(0, MAX_IMAGES):
                 fdw.face_detection_webcam(self._found_face)
 
-            # create csv
-            csvPath = "./recognition/faceDatabase"
-            util.create_csv(csvPath)
-
+            # update model
             fr = fre.faceRecognition(self._duplicated_index_check)
             fr.update_model()
 

@@ -15,29 +15,23 @@ HEIGHT_DB_FACES = 112
 class faceRecognition:
     def __init__(self, recognizied_callback):
         self.face_recognized_callback = recognizied_callback
-        # select mode for the face recognition
 
-        #self.model_eigenfaces = cv2.createEigenFaceRecognizer()
-        #self.model_fisherfaces = cv2.createFisherFaceRecognizer()
         self.model_lbph = cv2.createLBPHFaceRecognizer()
-
-        sep = os.sep
-        self.csvPath = ".%srecognition%sfaceDatabase%s" % (sep,sep,sep)
+        self.csvPath = ".%srecognition%sfaceDatabase%s" % (os.sep,os.sep,os.sep)
 
     def update_model(self):
         EventLogger.info("Face recognition training started")
+        util.create_csv(self.csvPath)
         training_data = self.read_csv((self.csvPath + "faces.csv")).readlines()
         data_dict = self.create_label_matrix_dict(training_data)
 
-        #self.model_eigenfaces.train(data_dict.values(), np.array(data_dict.keys()))
-        #self.model_fisherfaces.train(data_dict.values(), np.array(data_dict.keys()))
-        self.model_lbph.train(data_dict.values(), np.array(data_dict.keys()))
+        try:
+            self.model_lbph.train(data_dict.values(), np.array(data_dict.keys()))
+        except Exception as e:
+            EventLogger.error("Error-Training: " + str(e))
 
         try:
-            #self.model_eigenfaces.save(self.csvPath + "eigenface-model.xml")
-            #self.model_fisherfaces.save(self.csvPath + "fisherfaces-model.xml")
             self.model_lbph.save(self.csvPath + "lbph-model.xml")
-
         except Exception as e:
             EventLogger.error(e)
 
@@ -46,8 +40,6 @@ class faceRecognition:
     def load_model(self):
         try:
             if os.path.isfile(self.csvPath + "lbph-model.xml"):
-                #self.model_eigenfaces.load(self.csvPath + "eigenface-model.xml")
-                #self.model_fisherfaces.load(self.csvPath + "fisherfaces-model.xml")
                 self.model_lbph.load(self.csvPath + "lbph-model.xml")
                 EventLogger.info("Loaded face rec-model: " + self.csvPath + "lbph-model.xml")
             else:
@@ -86,7 +78,7 @@ class faceRecognition:
 
     def _recognize_face(self,frame, faces):
         if len(faces) == 0:
-            self.face_recognized_callback("No-Index")
+            self.face_recognized_callback("No-Face-Detected")
             return
 
         self.load_model()
@@ -101,19 +93,14 @@ class faceRecognition:
             width, height = cv2.cv.GetSize(cv2.cv.fromarray(input_image))
 
             if height != HEIGHT_DB_FACES or width != WIDTH_DB_FACES:
-                sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES,HEIGHT_DB_FACES), 8, 1)
+                sized_face = cv2.cv.CreateImage((WIDTH_DB_FACES, HEIGHT_DB_FACES), 8, 1)
                 cv2.cv.Resize(input_image, sized_face, interpolation=cv2.cv.CV_INTER_CUBIC)
             else:
                 sized_face = input_image
 
             # actual face recognition
-            #predicted_label_eigenfaces, conf_eigenfaces = self.model_eigenfaces.predict(sized_face)
-            #predicted_label_fisherfaces, conf_fisherfaces = self.model_fisherfaces.predict(sized_face)
             EventLogger.info("Started prediction")
             predicted_label_lbph, conf_lbph = self.model_lbph.predict(sized_face)
-
-            #EventLogger.info('Eigenfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_eigenfaces, "confidence ":conf_eigenfaces})
-            #EventLogger.info('Fisherfaces: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_fisherfaces, "confidence ":conf_fisherfaces})
             EventLogger.info('LBPH: Predicted: %(predicted)s Confidence : %(confidence )s ' % {"predicted": predicted_label_lbph, "confidence ":conf_lbph})
 
             try:
@@ -121,10 +108,11 @@ class faceRecognition:
             except Exception as e:
                 EventLogger.error(e)
 
-            index = util.get_id_of_index( self.csvPath, predicted_label_lbph)
-            self.face_recognized_callback(index)
-        EventLogger.info("Face recognition finished")
+            if conf_lbph <= 110:
+                user = util.get_real_user( self.csvPath, predicted_label_lbph)
+                self.face_recognized_callback(user)
+            else:
+                self.face_recognized_callback("Non-Index")
 
     def start_process(self):
-        util.create_csv(self.csvPath)
         fdw.face_detection_webcam(self._recognize_face)
