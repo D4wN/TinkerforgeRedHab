@@ -20,6 +20,12 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         EventLogger.error("Aborting Program, wrong Parameters!")
 
+    elif sys.argv[1] == "DEBBUG":
+        EventLogger.info("DEBUG MODE STAERTED...")
+        # Here the Runner with Debug mode
+        runner = RecognitionRunner(FaceRecognizer())
+        runner._start_debug([None, 2])
+
     elif sys.argv[1] == "0":
         EventLogger.debug("argv[1] == 0")
         EventLogger.info("NFC/RFID Writer")
