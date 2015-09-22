@@ -1,4 +1,5 @@
 from thread import start_new_thread
+from flask_webserver import FlaskWebserver
 from gui.gui_control import GuiControl
 from util.event_logger import EventLogger
 
@@ -13,6 +14,9 @@ class RecognitionRunner():
     def __init__(self, recognizer):
         self._name = "[RecognitionRunner]"
 
+        self._webserver = FlaskWebserver()
+
+
         self._gui = GuiControl.Instance()
         self._recognizer = recognizer
 
@@ -20,6 +24,8 @@ class RecognitionRunner():
 
     def start(self, args=None):
         EventLogger.debug(self._name + " started running...")
+        self._webserver.start()
+
         if self._recognizer == None:
             EventLogger.error(self._name + " has no Recognizer! Start aborted!")
             return
@@ -37,6 +43,11 @@ class RecognitionRunner():
 
         #End
         EventLogger.debug(self._name + " stopped running...")
+
+        #Wait for Webserver
+        self._webserver.stop()
+        self._webserver.join()
+
         self._gui._db_end_state()
         self._gui.stop_ipcon()
 

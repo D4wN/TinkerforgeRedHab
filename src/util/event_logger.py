@@ -3,7 +3,12 @@
                                 Event Logger
  ---------------------------------------------------------------------------*/
 """
+from datetime import datetime
+from PyQt4 import QtCore
 import logging
+from PyQt4.QtCore import SIGNAL
+from multiprocessing import Queue
+
 
 class EventLogger():
     """
@@ -124,3 +129,57 @@ class FileLogger(logging.Logger):
         self.addHandler(ch)
         
         self.info("###### NEW LOGGING SESSION STARTED ######")
+
+class WebserverLogger(logging.Logger):
+
+    #Queue for the Webserver to get his messages
+    _queue = Queue()
+
+    # for level as string
+    _convert_level = {}
+    _convert_level[logging.DEBUG] = logging._levelNames.get(logging.DEBUG)  # "DEBUG"
+    _convert_level[logging.INFO] = logging._levelNames.get(logging.INFO)  # "INFO"
+    _convert_level[logging.WARN] = logging._levelNames.get(logging.WARN)  # "WARNING"
+    _convert_level[logging.WARNING] = logging._levelNames.get(logging.WARNING)  # "WARNING"
+    _convert_level[logging.CRITICAL] = logging._levelNames.get(logging.CRITICAL)  # "CRITICAL"
+    _convert_level[logging.ERROR] = logging._levelNames.get(logging.ERROR)  # "ERROR"
+
+    _output_format = "{asctime} - <b>{levelname:8}</b> - {message}"
+    _output_format_warning = "<font color=\"orange\">{asctime} - <b>{levelname:8}</b> - {message}</font>"
+    _output_format_critical = "<font color=\"red\">{asctime} - <b>{levelname:8}</b> - {message}</font>"
+
+
+    def __init__(self, name, log_level):
+        logging.Logger.__init__(self, name, log_level)
+
+    def debug(self, msg):
+        self.log(logging.DEBUG, msg)
+
+    def info(self, msg):
+        self.log(logging.INFO, msg)
+
+    def warn(self, msg):
+        self.log(logging.WARN, msg)
+
+    def warning(self, msg):
+        self.log(logging.WARNING, msg)
+
+    def critical(self, msg):
+        self.log(logging.CRITICAL, msg)
+
+    def error(self, msg):
+        self.log(logging.ERROR, msg)
+
+    def log(self, level, msg):
+
+        if level >= self.level:
+            asctime = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
+            levelname = WebserverLogger._convert_level[level]
+
+            if level == logging.WARN or level == logging.WARNING:
+                WebserverLogger._queue.put(WebserverLogger._output_format_warning.format(asctime=asctime, levelname=levelname, message=msg))
+            elif level == logging.CRITICAL or level == logging.ERROR:
+                WebserverLogger._queue.put(WebserverLogger._output_format_critical.format(asctime=asctime, levelname=levelname, message=msg))
+            else:
+                WebserverLogger._queue.put(WebserverLogger._output_format.format(asctime=asctime, levelname=levelname, message=msg))
+

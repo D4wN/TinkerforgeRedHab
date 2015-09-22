@@ -14,6 +14,7 @@ def __init_event_logging():
 
 if __name__ == "__main__":
     __init_event_logging()
+
     EventLogger.debug(
         "\nargv[1] == 0 => NFC/RFID Writing argv[2] = name\nargv[1] == 1 => NFC/RFID Recognition\nargv[1] == 2 => Face Recognition")
 

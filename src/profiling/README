@@ -10,3 +10,4 @@ Important Task to be done before running:
     "/etc/openhab/configurations/rules/demo.rules"
 
         "PATH_TO_RULES_FILE": "C:/Programmierung/Workspaces/Python/TinkerforgeRedHab/openHabProfiles/test.rules",
+
