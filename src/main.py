@@ -4,12 +4,12 @@ from recognition.recognizer import FaceRecognizer, NfcRfidRecognizer
 
 # print sys.path
 
-from util.event_logger import EventLogger, ConsoleLogger
+from util.event_logger import EventLogger, ConsoleLogger, FileLogger
 
 
 def __init_event_logging():
     EventLogger.add_logger(ConsoleLogger("ConsoleLogger", EventLogger.EVENT_LOG_LEVEL))
-    #EventLogger.add_logger(FileLogger("FileLogger", EventLogger.EVENT_LOG_LEVEL, EventLogger.EVENT_FILE_LOGGING_PATH))
+    EventLogger.add_logger(FileLogger("FileLogger", EventLogger.EVENT_LOG_LEVEL, EventLogger.EVENT_FILE_LOGGING_PATH))
 
 
 if __name__ == "__main__":
