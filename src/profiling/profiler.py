@@ -69,7 +69,7 @@ class Profiler():
             return ret_msg
 
         ret_msg = str(self._name) + " Profile(" + str(recognized_name) + ") successfully updated values and rules!"
-        EventLogger.info("Profiler finished working!")
+        EventLogger.info(self._name + " Profiler finished working!")
         return ret_msg
 
     """

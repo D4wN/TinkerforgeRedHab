@@ -1,5 +1,8 @@
 import os
+import re
+
 import requests
+
 from util.event_logger import EventLogger
 
 """
@@ -7,7 +10,6 @@ from util.event_logger import EventLogger
                                 AbstractUpdaterObject
  ---------------------------------------------------------------------------*/
 """
-
 
 class AbstractUpdaterObject():
     def __init__(self, key, value):
@@ -21,13 +23,11 @@ class AbstractUpdaterObject():
     def __str__(self):
         return str(self._name)
 
-
 """
 /*---------------------------------------------------------------------------
                                 ItemUpdaterObject
  ---------------------------------------------------------------------------*/
 """
-
 
 class ItemUpdaterObject(AbstractUpdaterObject):
     """
@@ -38,17 +38,15 @@ class ItemUpdaterObject(AbstractUpdaterObject):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[ItemUpdaterObject:" + str(self._key) + "," + str(self._value) + "]"
 
-
 """
 /*---------------------------------------------------------------------------
                                 RESTUpdater
  ---------------------------------------------------------------------------*/
 """
 
-
 class RESTUpdater(AbstractUpdaterObject):
-    # OPENHAB_IP = "192.168.0.32:8080"  # FIXME should be in the profile file?
-    OPENHAB_IP = "localhost:8080"  # FIXME DEMO URL ONLY!
+    OPENHAB_IP = "192.168.0.68:8080"  # FIXME should be in the profile file?
+    # OPENHAB_IP = "localhost:8080"  # FIXME DEMO URL ONLY!
     # TODO find better solution for inverting values, or resetting them
     KNOWN_VALUE_NEGATIVES = {
         'ON': 'OFF',
@@ -69,16 +67,16 @@ class RESTUpdater(AbstractUpdaterObject):
     def __init__(self, key, value, reset_item=False):
         AbstractUpdaterObject.__init__(self, key, value)
         self._name = "[RESTUpdater:" + str(self._key) + "," + str(self._value) + "]"
-        self._reset_item = reset_item
+        # self._reset_item = reset_item
+        self._reset_item = False # FIXME create universal solution; what to do with items?
 
     def start(self):
         if self._reset_item:
             if RESTUpdater.KNOWN_VALUE_NEGATIVES.has_key(self._value):
                 self._value = RESTUpdater.KNOWN_VALUE_NEGATIVES[self._value]
             else:
-                EventLogger.warning(
-                    self._name + " POST[key:" + str(self._key) + "|value:" + str(
-                        self._value) + "] Could not reset! No known invert value found!")
+                EventLogger.warning(self._name + " POST[key:" + str(self._key) + "|value:" + str(
+                    self._value) + "] Could not reset! No known invert value found!")
                 return self._name + " No known invert value found! Item could not reset"
 
         # EventLogger.debug(self._name + " started...")
@@ -86,10 +84,8 @@ class RESTUpdater(AbstractUpdaterObject):
             return self.__post_command()
         except Exception as ce:
             # EventLogger.error(self._name + " " + str(ce))
-            EventLogger.warning(
-                "Update Item[" + str(self._key) + "] with Value[" + str(
-                    self._value) + "] was NOT successful! Error: " + str(
-                    ce))
+            EventLogger.warning("Update Item[" + str(self._key) + "] with Value[" + str(
+                self._value) + "] was NOT successful! Error: " + str(ce))
             return self._name + " " + str(ce)
 
     def __post_command(self):
@@ -106,18 +102,16 @@ class RESTUpdater(AbstractUpdaterObject):
         EventLogger.info("Update Item[" + str(self._key) + "] with Value[" + str(self._value) + "] was successful!")
         return "Status: " + str(requests.codes.ok)
 
-
 """
 /*---------------------------------------------------------------------------
                                 RuleUpdater
  ---------------------------------------------------------------------------*/
 """
 
-
 class RuleUpdater(AbstractUpdaterObject):
     PATH_RULES_KEY = "PATH_TO_RULES_FILE"
-    RULE_START_FORMATTER = "#start#%s#%s#"  # % (key, value)
-    RULE_END_FORMATTER = "#end#%s#%s#"
+
+    REMOVE_ALL_RULE = True  # change to only delete profile rules # FIXME temp change to remove all rules
 
     """
     This class updates the rules file of openHab. ONLY working on localhost right now!
@@ -134,7 +128,15 @@ class RuleUpdater(AbstractUpdaterObject):
         AbstractUpdaterObject.__init__(self, key, value)
         self._rules = rules
         self._name = "[RuleUpdater:" + str(self._key) + "," + str(self._value) + "]"
-        self._remove_rules = remove_rules;
+        # self._remove_rules = remove_rules; # Todo Currently not realy needed
+
+        # Rule specific
+        self._rule_prefix = ("\n//#start#%s#%s#\n" % (self._key, self._value))
+        self._rule_postfix = ("//#end#%s#%s#\n" % (self._key, self._value))
+
+        # To remove rules without id and value
+        self._rule_prefix_regex = '\n//#start#'
+        self._rule_postfix_regex = '//#end#.*?#.*?#\n'
 
     """
     This function starts the rule update process.
@@ -170,12 +172,17 @@ class RuleUpdater(AbstractUpdaterObject):
 
         if content is None:
             return self.__error_return(self._name + " Content of the rules could not be read!")
-        for rule in self._rules[HabUpdater.PROFILE_KEY_RULES]:
 
-            if self._remove_rules:
-                content = self._remove_rule(content, rule)
-            else:
-                content = self._insert_rule(content, rule)
+        # Change logic to remove and add rules every time!
+        # Remove Rules fo the Profile or ALL Rules
+        # if self._remove_rules:
+        if RuleUpdater.REMOVE_ALL_RULE:
+            content = self._remove_all_rules(content)
+        else:
+            content = self._remove_profile_rules(content)
+        # Add Rules from Profile
+        for rule in self._rules[HabUpdater.PROFILE_KEY_RULES]:
+            content = self._insert_rule(content, rule)
 
         # write content back
         # FIXME: Permission Problems? How can we open the file as Admin?!
@@ -195,9 +202,11 @@ class RuleUpdater(AbstractUpdaterObject):
 
     def _insert_rule(self, content, rule):
         ##add identifier to the rule TODO: temp solution, need format?
-        rule = (
-            ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
-                "\n//#end#%s#%s#\n" % (self._key, self._value)))
+        # rule = (
+        #     ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
+        #         "\n//#end#%s#%s#\n" % (self._key, self._value)))
+        rule = self._rule_prefix + rule + self._rule_postfix
+
         cleaned_rule = self.__clean_string(rule)
         cleaned_content = self.__clean_string(content)  # for simple contains search functionality
 
@@ -218,20 +227,34 @@ class RuleUpdater(AbstractUpdaterObject):
     content         =>  The new content as string.
     """
 
-    def _remove_rule(self, content, rule):
-        rule = (
-            ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + (
-                "\n//#end#%s#%s#\n" % (self._key, self._value)))
-        cleaned_rule = self.__clean_string(rule)
-        cleaned_content = self.__clean_string(content)  # for simple contains search functionality
-
-        if cleaned_rule in cleaned_content:
-            EventLogger.info("Removed Rule: " + cleaned_rule)
-            content = content.replace(rule, '')  # TODO bettersolution to remove the rule?
-        else:
-            EventLogger.warning("Rule not in rules File! [" + str(self.__get_rule_name(rule)) + "]")
+    def _remove_profile_rules(self, content):
+        content = re.sub(self._rule_prefix + '.*?' + self._rule_postfix, '', content,
+                         flags=re.DOTALL)  # re.DOTALL = multiline regex
+        EventLogger.info(self._name + "Removed all Profile Rules.")
 
         return content
+
+        # rule = (
+        # ("\n//#start#%s#%s#\n" % (self._key, self._value)) + rule + ("\n//#end#%s#%s#\n" % (self._key, self._value)))
+        # rule = self._rule_prefix + rule + self._rule_postfix
+        #
+        # cleaned_rule = self.__clean_string(rule)
+        # cleaned_content = self.__clean_string(content)  # for simple contains search functionality
+        #
+        # if cleaned_rule in cleaned_content:
+        #     EventLogger.info("Removed Rule: " + cleaned_rule)
+        #     content = content.replace(rule, '')  # TODO bettersolution to remove the rule?
+        # else:
+        #     EventLogger.warning("Rule not in rules File! [" + str(self.__get_rule_name(rule)) + "]")
+        #
+        # return content
+
+    def _remove_all_rules(self, content):
+        # remove every rule of
+        new_content = re.sub(self._rule_prefix_regex + '.*?' + self._rule_postfix_regex, '', content,
+                             flags=re.DOTALL)  # re.DOTALL = multiline regex
+        EventLogger.info(self._name + "Removed all Rules.")
+        return new_content
 
     """
     This function injects a rule into the rules file.

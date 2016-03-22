@@ -1,5 +1,6 @@
 from thread import start_new_thread
 from time import sleep
+
 from gui.gui_control import GuiControl
 from util.event_logger import EventLogger
 
@@ -9,15 +10,15 @@ from util.event_logger import EventLogger
  ---------------------------------------------------------------------------*/
 """
 
-
 class RecognitionRunner():
     def __init__(self, recognizer):
         self._name = "[RecognitionRunner]"
 
         self._gui = GuiControl.Instance()
-        self._recognizer = recognizer
-
         self._gui.start_ipcon()
+
+        self._recognizer = recognizer
+        self._recognizer._init_red()
 
     def start(self, args=None):
         EventLogger.debug(self._name + " started running...")
@@ -29,17 +30,18 @@ class RecognitionRunner():
         # init DualButton LEDs
         self._gui._db_start_state()
 
-        #0|1
+        # 0|1
         while self._gui.recognition_running:
 
             if not self._gui.recognition_progress and self._gui.recognition_state:
-                #1|1
+                # 1|1
                 self._gui.recognition_progress = True
                 start_new_thread(self._recognizer.recognize, (self.__cb, args))
             sleep(0.5)
 
-        #End
+        # End
         EventLogger.debug(self._name + " stopped running...")
+        self._recognizer.release()
 
         self._gui._db_end_state()
         self._gui.stop_ipcon()
@@ -63,11 +65,13 @@ class RecognitionRunner():
             self._gui.recognition_progress = True
             start_new_thread(self._recognizer.recognize, (self.__cb, args))
 
+        # End
+        EventLogger.debug(self._name + " stopped running...???")
+        self._recognizer.release()
 
-        #End
-        EventLogger.debug(self._name + " stopped running...")
+        self._gui._db_end_state()
+        self._gui.stop_ipcon()
 
     def __cb(self, args):
         self._recognizer.cb_recognize(args)
         self._gui._db_recognizer_state_off()
-
