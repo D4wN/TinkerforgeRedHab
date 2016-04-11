@@ -7,7 +7,7 @@ class ProfileDecider:
 
     # E.g. Profile some(10) need fewer then 7(Threshold 10 - Threshold_Percentage 10*0,3) faces to revert back to few(5)
     PROFILE_THRESHOLD_PERCENTAGE = 0.3
-    # Pfile names and threshold values
+    # Profile names and threshold values # TODO change algo for percentage detection? look at space between profile and next lowest instead of the profile value
     PROFILE_THRESHOLD = {
         'few': 5,
         'some': 10,

@@ -201,7 +201,7 @@ class FaceCountRecognizer(AbstractRecognizer):
             return
 
         # TODO close rest
-        result = self._red.vision_remove_all_modules()  # TODO implemnt remove_module with ide -> still bugged!
+        result = self._red.vision_remove_all_modules()
         EventLogger.info(self._name + "Removed Vision Module.(" + str(result) + ")")
         EventLogger.info(self._name + "Running ModuleCount: " + str(self._red.vision_libs_loaded_count()))
 
@@ -215,13 +215,6 @@ class FaceCountRecognizer(AbstractRecognizer):
         # self._cb_counter = 0
 
         EventLogger.info(self._name + " started.")
-
-        #FIXME DEBUG ONLYY
-        ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(self._vision_module.id, 26, 0, 0, 0, "Nope"))
-        ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(self._vision_module.id, 20, 0, 0, 0, "Nope"))
-        ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(self._vision_module.id, 6, 0, 0, 0, "Nope"))
-        ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(self._vision_module.id, 26, 0, 0, 0, "Nope"))
-        ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(self._vision_module.id, 16, 0, 0, 0, "Nope"))
 
 
         # check if enough values were given by callbacks
@@ -242,7 +235,6 @@ class FaceCountRecognizer(AbstractRecognizer):
         EventLogger.debug(self._name + " recognized_name = " + str(recognized_name))
         EventLogger.info(self._name + " finished... TODO start profiler!")
 
-        # TODO start profiler
         if recognized_name is None:
             EventLogger.info(self._name + " No Profile given. Nothing changed.")
             return
@@ -270,21 +262,14 @@ class FaceCountRecognizer(AbstractRecognizer):
             # sleep(1)
 
     def __vision_callback(self, id, x, y, w, h, msg):
-        return
-
         if self._vision_module.id != id:
             EventLogger.debug(self._name + " Vision Callback wrong ID(" + str(id) + ")")
             return
 
         if x == -1:
             EventLogger.debug(self._name + " x == -1 No Valid Callback")
-            # return # FIXME implement when callbakcs fixed!
+            return
 
-        # FIXME <---------------------------------------------------------------------------------------------------------######################################
-        # only debugging values!
-        import random
-        x = random.randint(3, 10)
-
-        # self._cb_counter += 1  # only register valid callbacks
+        print id, x, y, w, h, msg
         ProfileDecider.CALLBACK_BUFFER.append(FaceCounterData(id, x, y, w, h, msg))
-        print data
+

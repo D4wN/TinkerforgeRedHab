@@ -27,7 +27,6 @@ class GuiControl():
         self._DB_UID = "mAo"
         self.recognition_running = True
         self.recognition_state = False
-        #TODO bad idea?
         self.recognition_progress = False
 
         # NFC/RFID
@@ -137,9 +136,6 @@ class GuiControl():
                     'No NFC/RFID Tag found! TODO: Message - Token @ Lesegereat -> Button')  # TODO: Message - Token @ Lesegeraet -> Button
             else:
                 EventLogger.debug('Error: ' + str(state))
-
-                # TODO check for errors in coding!
-                #EventLogger.error(self._name + "_nfc_cb_to_profiler was None! DEBUG ONLY!")
 
     def _debug_print(self):
         print "self.recognition_running  = " + str(self.recognition_running) + "\nself.recognition_state    = " + str(

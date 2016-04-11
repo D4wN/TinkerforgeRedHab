@@ -51,7 +51,7 @@ class Profiler():
         for f in files:
             if str(f) == str(recognized_name) or str(f[:f.find(".")]) == str(recognized_name): #TODO find substring without .profile
                 found = True
-                # TODO do something more
+
                 #2. profile found -> new updater Thread
                 EventLogger.debug(str(self._name) + " Profile(" + str(recognized_name) + ") found!")
 
@@ -82,8 +82,8 @@ class Profiler():
 
     def __get_profile_list(self):
         try:
-            profile_dir = os.path.join(os.path.dirname(__file__), "..", "..",
-                                       Profiler.PROFILE_LOCATION_PATH)  # FIXME relative path?
+            # FIXME relative path?
+            profile_dir = os.path.join(os.path.dirname(__file__), "..", "..", Profiler.PROFILE_LOCATION_PATH)
             files = os.listdir(profile_dir)
         except Exception as e:
             EventLogger.error(str(self._name) + ".__getProfileList: Exception(" + str(e) + ")")
