@@ -1,7 +1,7 @@
 {
   "id": "0010",
   "items": {
-    "Segment7": "0014",
+    "Segment7": "0009",
     "TF_LCD": "TFNUM<00>Hallo: Some  "
   },
   "rules": {
